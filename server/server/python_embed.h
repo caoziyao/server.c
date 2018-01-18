@@ -15,8 +15,8 @@
 void
 initPythonEnv();
 
-
 char *
 callPythonFun(char *request);
+
 
 #endif /* python_embed_h */

@@ -22,15 +22,15 @@ openSocket(unsigned short port) {
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
     serveraddr.sin_port = htons(port);
-    //
+    
     //
     bind(s, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
     listen(s, 5);
     //
     printf("listening at port %d\n", port);
     return s;
-    
 }
+
 
 int
 acceptClient(int socketFile) {
@@ -42,5 +42,4 @@ acceptClient(int socketFile) {
     int clientSocket = accept(s, (struct sockaddr *)&client, (socklen_t *)&size);
     
     return clientSocket;
-
 }

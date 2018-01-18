@@ -5,7 +5,6 @@
 //  Created by working on 2018/1/17.
 //  Copyright © 2018年 working. All rights reserved.
 //
-
 /*
  cc  -I/Users/working/.pyenv/versions/3.6-dev/include/python3.6m -L/Users/working/.pyenv/versions/3.6-dev/lib/python3.6/config-3.6m-darwin -lpython3.6m *.c -o main.exe && ./main.exe
  */
@@ -44,6 +43,7 @@ response(void *socketFile) {
     return NULL;
 }
 
+
 void
 init() {
     initPythonEnv();
@@ -64,9 +64,7 @@ listenConnect(void *socketFile) {
         
         pthread_t t;
         pthread_create(&t, NULL, response, (void *)n);
-        
     }
-    
     
     return NULL;
 }

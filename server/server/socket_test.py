@@ -20,7 +20,7 @@ def log(*args, **kwargs):
 
 
 def request():
-    for i in range(100):
+    for i in range(1000):
         cmd = 'curl localhost:3000'
         os.system(cmd)
         # time.sleep(0.5)
