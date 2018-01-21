@@ -70,8 +70,8 @@ listenConnect(void *socketFile) {
 }
 
 
-
-int main(int argc, const char * argv[]) {
+void
+pThreadServer() {
     unsigned int port = 3000;
     int s = openSocket(port);
     
@@ -85,6 +85,11 @@ int main(int argc, const char * argv[]) {
     for(int i = 0; i < 20; i++) {
         pthread_join(tid[i], NULL);
     }
-    
+
+}
+
+
+int main(int argc, const char * argv[]) {
+    pThreadServer();
     return 0;
 }
