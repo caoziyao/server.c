@@ -10,6 +10,8 @@
  */
 /*
  test:  curl -v localhost:3000
+ 想明白思路
+ 
  */
 
 #include <stdio.h>
