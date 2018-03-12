@@ -2,9 +2,7 @@
 //  response.c
 //  server
 //
-//  Created by working on 2018/3/12.
-//  Copyright © 2018年 working. All rights reserved.
-//
+
 
 #include "response.h"
 
@@ -92,3 +90,4 @@ GuaResponse(void *socketFile){
     close(s);
     return NULL;
 }
+

@@ -117,6 +117,7 @@ GuaThreadPoolAddTask(GuaThreadPool* pool, GuaTaskCallback *callback, void *arg) 
     return 0;
 }
 
+
 bool
 isEmptyGuaTaskQueue(GuaTaskQueue *queue) {
     int n = queue->n;

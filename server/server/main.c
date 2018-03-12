@@ -1,8 +1,5 @@
 //
 //  main.c
-//
-//  Created by working on 2018/1/19.
-//  Copyright © 2018年 working. All rights reserved.
 // cc *.c -Ilua-5.3.4/src -llua -Llua-5.3.4/src && ./a.out
 
 
@@ -17,17 +14,17 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "threadpool.h"
+//#include "threadpool.h"
 #include "response.h"
 #include "gwsocket.h"
 #include "gwkqueue.h"
+#include "config.h"
 
 int
 main(int argc, const char *argv[]) {
 
     // kqueue
     int epollfd = initKqueue();
-    
     
     // socket
     unsigned int port = 3000;
@@ -38,7 +35,7 @@ main(int argc, const char *argv[]) {
     int size = sizeof(struct sockaddr_in);
     
     // 注册事件
-    updateEvents(epollfd, s);
+    initEvent(epollfd, s);
 
     while (true) {
         loopOnce(epollfd, s, 10000);

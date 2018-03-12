@@ -2,9 +2,6 @@
 //  response.h
 //  server
 //
-//  Created by working on 2018/3/12.
-//  Copyright © 2018年 working. All rights reserved.
-//
 
 #ifndef response_h
 #define response_h

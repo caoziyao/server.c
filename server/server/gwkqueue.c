@@ -1,15 +1,17 @@
 //
 //  gwkqueue.c
 //  server
-//
-//  Created by working on 2018/3/13.
-//  Copyright © 2018年 working. All rights reserved.
-//
-const static int FdNum = 1;         // 两个文件描述符
-const static int BufferSize = 1024; // 缓冲区大小
+
 
 #include "gwkqueue.h"
 #include "gwsocket.h"
+
+const static int FdNum = 2;         // 两个文件描述符
+const static int BufferSize = 1024; // 缓冲区大小
+static int kReadEvent = 1;
+static int kWriteEvent = 2;
+static int kAdd = 1;
+static int kDelete = 2;
 
 int
 initKqueue(){
@@ -20,16 +22,53 @@ initKqueue(){
     return fd;
 }
 
+
 void
-updateEvents(int efd, int fd){
+initEvent(int efd, int fd){
+    struct kevent ev[FdNum];
+    int n = 0;
+    EV_SET(&ev[n++], fd, EVFILT_READ, EV_ADD|EV_ENABLE, 0, 0, (void*)(intptr_t)fd);
+    EV_SET(&ev[n++], fd, EVFILT_WRITE, EV_ADD|EV_ENABLE, 0, 0, (void*)(intptr_t)fd);
+    
+    int r = kevent(efd, ev, n, NULL, 0, NULL);
+    if (r < 0) {
+        quit("updateEvents()");
+    }
+}
+
+
+void
+updateEvents(int efd, int fd, int event, int status){
     struct kevent ev[FdNum];
     int n = 0;
     
     // 注册事件
-    EV_SET(&ev[n++], fd, EVFILT_READ, EV_ADD|EV_ENABLE, 0, 0, (void*)(intptr_t)fd);
-//    EV_SET(&ev[n++], fd, EVFILT_WRITE, EV_ADD|EV_ENABLE, 0, 0, (void*)(intptr_t)fd);
+    if (event & kReadEvent) {
+        // read
+        if (status & kAdd) {
+            EV_SET(&ev[n++], fd, EVFILT_READ, EV_ADD|EV_ENABLE, 0, 0, (void*)(intptr_t)fd);
+        } else if (status & kDelete) {
+            EV_SET(&ev[n++], fd, EVFILT_READ, EV_DELETE, 0, 0, (void*)(intptr_t)fd);
+        } else {
+            quit("updateEvents read()");
+        }
+    }
     
-    kevent(efd, ev, n, NULL, 0, NULL);
+    if (event & kWriteEvent) {
+        // write
+        if (status & kAdd) {
+            EV_SET(&ev[n++], fd, EVFILT_WRITE, EV_ADD|EV_ENABLE, 0, 0, (void*)(intptr_t)fd);
+        } else if (status & kDelete) {
+            EV_SET(&ev[n++], fd, EVFILT_WRITE, EV_DELETE, 0, 0, (void*)(intptr_t)fd);
+        } else {
+            quit("updateEvents write()");
+        }
+    }
+    
+    int r = kevent(efd, ev, n, NULL, 0, NULL);
+    if (r < 0) {
+        quit("updateEvents()");
+    }
 }
 
 void
@@ -43,7 +82,8 @@ handleAccept(int efd, int fd){
     int r = getpeername(cfd, (struct sockaddr*)&peer, &alen);
     setNonBlock(cfd);
     
-    updateEvents(efd, cfd);
+//    updateEvents(efd, cfd, kReadEvent | kWriteEvent, kAdd);
+    initEvent(efd, cfd);
 }
 
 void
@@ -87,7 +127,8 @@ loopOnce(int efd, int lfd, int waitms){
             // write
             printf("write\n");
             //实际应用应当实现可写时写出数据，无数据可写才关闭可写事件
-//            updateEvents(efd, ev_fd, kReadEvent, true);
+            updateEvents(efd, ev_fd, kWriteEvent, kDelete);
+            
         } else {
             printf("unknow event");
         }

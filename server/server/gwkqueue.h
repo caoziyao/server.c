@@ -1,10 +1,6 @@
 //
 //  gwkqueue.h
 //  server
-//
-//  Created by working on 2018/3/13.
-//  Copyright © 2018年 working. All rights reserved.
-//
 
 #ifndef gwkqueue_h
 #define gwkqueue_h
@@ -27,11 +23,15 @@
 #include <arpa/inet.h>
 
 #include "utils.h"
+#include "config.h"
 
 int
 initKqueue();
 
 void
-updateEvents(int efd, int fd);
+updateEvents(int efd, int fd, int event, int status);
+
+void
+initEvent(int efd, int fd);
 
 #endif /* guakqueue_h */
