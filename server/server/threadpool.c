@@ -1,11 +1,8 @@
 //
-//  guathreadpool.c
-//  a44
+//  threadpool.c
 //
 //  Created by working on 2018/1/12.
 //  Copyright © 2018年 working. All rights reserved.
-//
-// guathreadpool.c
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +10,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include "guathreadpool.h"
+#include "threadpool.h"
 
 struct _Task;
 typedef struct _Task GuaTask;
@@ -29,7 +26,6 @@ typedef struct _TaskQueue GuaTaskQueue;
 struct _TaskQueue{
     int n;
     GuaTask *task;
-    
 };
 
 
@@ -76,7 +72,6 @@ GuaThreadPoolNew(int numberOfThreads) {
     tp->queue = queue;
     
     for (int i = 0; i < n; i++) {
-        
         int err = pthread_create(&tp->threads[i], NULL, _GuaThreadPoolThreadNew, tp);
         if (err != 0) {
             printf("create pthread error: %s\n", strerror(err));
@@ -99,7 +94,6 @@ appendTaskFromQueue(GuaTaskQueue *queue, GuaTask *newTask) {
     task->next = newTask;
     return task;
 }
-
 
 
 int
@@ -149,7 +143,8 @@ popGuaTaskQueue(GuaTaskQueue *queue) {
     return t;
 }
 
-bool isEmptyTask(GuaTaskQueue *queue) {
+bool
+isEmptyTask(GuaTaskQueue *queue) {
     int n = queue->n;
     if (n == 0) {
         return true;
@@ -207,5 +202,31 @@ GuaThreadPoolFree(GuaThreadPool *pool) {
     return 0;
 }
 
+
+
+
+//void
+//threadTestRun(){
+//    const int numberOfTasks = 20;
+//
+//    GuaThreadPool *pool = GuaThreadPoolNew(5);
+//
+//    unsigned int port = 3000;
+//    int s = openSocket(port);
+//
+//    struct sockaddr_in client;
+//    int size = sizeof(struct sockaddr_in);
+//
+//    while (true) {
+//        int *n = malloc(sizeof(int));
+//        *n = accept(s, (struct sockaddr *)&client, (socklen_t *)&size);
+//        GuaThreadPoolAddTask(pool, GuaResponse, n);
+//        printf("(add task %d)\n", *n);
+//    }
+//
+//    // GuaThreadPoolFree 要等所有的线程都退出后才会返回
+//    // 因为在队列中还没有执行的函数会执行后再退出
+//    GuaThreadPoolFree(pool);
+//}
 
 
