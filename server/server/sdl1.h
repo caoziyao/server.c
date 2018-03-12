@@ -1,6 +1,6 @@
 //
 //  sdl1.h
-//  server
+//  axe47_homew
 //
 //  Created by working on 2018/1/20.
 //  Copyright © 2018年 working. All rights reserved.
@@ -10,5 +10,8 @@
 #define sdl1_h
 
 #include <stdio.h>
+
+struct _LuaConfig;
+typedef struct _LuaConfig LuaConfig;
 
 #endif /* sdl1_h */

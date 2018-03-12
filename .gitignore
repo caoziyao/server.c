@@ -1,5 +1,9 @@
 */*.xcodeproj/*
-*/pthread_demo/*
+*/lua-5.3.4/*
+*/*/lua-5.3.4/*
+*.xml
+*/.idea/*
+*/*/.idea/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,7 +1,11 @@
-
+//
+//  guathreadpool.c
+//  a44
+//
 //  Created by working on 2018/1/12.
 //  Copyright © 2018年 working. All rights reserved.
-
+//
+// guathreadpool.c
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +13,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include "thread_pool.h"
+#include "guathreadpool.h"
 
 struct _Task;
 typedef struct _Task GuaTask;

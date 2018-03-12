@@ -1,7 +1,11 @@
-
+//
+//  guathreadpool.h
+//  a44
+//
 //  Created by working on 2018/1/12.
 //  Copyright © 2018年 working. All rights reserved.
 //
+// guathreadpool.h
 
 #ifndef guathreadpool_h
 #define guathreadpool_h
@@ -15,7 +19,9 @@ struct _GuaThreadPool;
 typedef struct _GuaThreadPool GuaThreadPool;
 
 // 函数指针 typedef
+// 这种东西就是照我的例子抄，别想背下来
 typedef void *(GuaTaskCallback)(void *);
+
 
 // 创建并返回一个 thread pool
 // 参数为线程池的线程数量
@@ -32,4 +38,4 @@ int GuaThreadPoolAddTask(GuaThreadPool *pool, GuaTaskCallback *callback, void *a
 int GuaThreadPoolFree(GuaThreadPool *pool);
 
 
-#endif
+#endif /* guathreadpool_h */
