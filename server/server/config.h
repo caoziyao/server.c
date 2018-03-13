@@ -9,7 +9,7 @@
 #ifndef config_h
 #define config_h
 
-// todo 应该使用 enum
+#define NumberOfWorker 4    // worker进程数
 
 
 #endif /* config_h */
