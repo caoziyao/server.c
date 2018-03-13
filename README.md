@@ -1,2 +1,2 @@
 # server.c
-Server by c
+server by c and lua

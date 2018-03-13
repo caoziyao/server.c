@@ -24,14 +24,19 @@
 
 #include "utils.h"
 #include "config.h"
+#include "constant.h"
+#include "threadpool.h"
 
 int
 initKqueue();
 
 void
-updateEvents(int efd, int fd, int event, int status);
+updateEvents(int efd, int fd, GwKQueueFilter filter, GwKQueueFlag flag);
 
 void
 initEvent(int efd, int fd);
+
+void
+loopOnce(int efd, int lfd, int waitms, GuaThreadPool *pool);
 
 #endif /* guakqueue_h */

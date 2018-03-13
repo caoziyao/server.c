@@ -23,11 +23,31 @@
 #include <arpa/inet.h>
 
 #include "utils.h"
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+
+
+
+void
+initLuaEnv();
+
+void
+closeLuaEnv();
 
 int
 openSocket(unsigned short port);
 
 void
 setNonBlock(int fd);
+
+int
+handleAccept(int socketFile);
+
+void
+handleRead(int socketFile);
+
+void *
+response(void *socketFile);
 
 #endif /* gwsocket_h */

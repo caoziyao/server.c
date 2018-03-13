@@ -7,7 +7,7 @@ end
 
 route_index = function ()
     local header = 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n'
-    local body = '<h1>Hello World hello</h1>'
+    local body = '<h1>Hello World aas</h1>'
     local r = header..body
     return r
 end
@@ -24,7 +24,6 @@ luaadd = function(request)
 
     local list = string.split(str, ' ')
     local path = list[2]
-    print("path", path)
 
     local r = ''
     if path == '/' then
