@@ -8,58 +8,55 @@
 #define TEXT_SZ 2048
 
 #include "gwshm.h"
-#define ShmSize 10000
-
-
-struct _GwShm {
-    char *shmptr;
-    int shmflg;  // shmflg是权限标志
-    int size;
-    int shmid;
-};
+#define ShmSize 1000
 
 
 GwShm *
 GwShmInit(){
-    GwShm *shm = malloc(sizeof(GwShm));
-    shm->shmflg = 0666 | IPC_CREAT;
-    shm->size = ShmSize;
+//    GwShm *shm = malloc(sizeof(GwShm));
+//    shm->shmflg = 0666 | IPC_CREAT;
+//    shm->size = ShmSize;
+    
+    int size = sizeof(GwShm);
+    int flg = 0666 | IPC_CREAT;
     
     // IPC_PRIVATE
-    int shmid = shmget(IPC_PRIVATE, shm->size, shm->shmflg);
+    int shmid = shmget(IPC_PRIVATE, size, flg);
     if (shmid < 0) {
         quit("shmget()");
     }
     
-    char *shmptr = shmat(shmid, 0, 0);
+    GwShm *shmptr = (GwShm *)shmat(shmid, 0, 0);
     if (shmptr == (void *)-1) {
         quit("shmat()");
     }
+    shmptr->size = size;
+    shmptr->shmid = shmid;
+//    shmptr->data = NULL;
     
-    shm->shmptr = shmptr;
-    shm->shmid = shmid;
+//    shm->shmptr = shmptr;
+//    shm->shmid = shmid;
     
-    return shm;
+    return shmptr;
 }
 
 
-
-// todo struct
-GwShmData *
-GwShmReadData(GwShm *shm) {
-    char *shmptr = shm->shmptr;
-    GwShmData *data = malloc(sizeof(GwShmData));
-    memcpy(data, shmptr, sizeof(GwShmData));
-    
-    return data;
-}
-
-// todo struct
-void
-GwShmWriteData(GwShm *shm, GwShmData *data){
-    char *shmptr = shm->shmptr;
-    memcpy(shmptr, data, sizeof(GwShmData));
-}
+//// todo struct
+//GwShmData *
+//GwShmReadData(GwShm *shm) {
+//    char *shmptr = shm->shmptr;
+//    GwShmData *data = malloc(sizeof(GwShmData));
+//    memcpy(data, shmptr, sizeof(GwShmData));
+//
+//    return data;
+//}
+//
+//// todo struct
+//void
+//GwShmWriteData(GwShm *shm, GwShmData *data){
+//    char *shmptr = shm->shmptr;
+//    memcpy(shmptr, data, sizeof(GwShmData));
+//}
 
 
 void

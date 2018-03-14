@@ -19,12 +19,22 @@
 
 int
 main(int argc, const char *argv[]) {
-    
+
     GwShm *shm = GwShmInit();
     
+    unsigned int port = 3000;
+    int s = openSocket(port);
+    setNonBlock(s);
+    
+    GwShmData *data = &shm->data;
+    data->s = s;
+    data->msg = "hello msg";
+    
+    // 新进程
     pid_t id;
     GwMasterFork(&id);
     
+    // kqueue
     int epollfd = initKqueue();
     
     if (id < 0) {
@@ -32,29 +42,23 @@ main(int argc, const char *argv[]) {
     } else if (id == 0) {
         // child
         sleep(1);
-        
-        GwShmData *data = GwShmReadData(shm);
+        GwShmData *data = &shm->data;
+        int s = data->s;
         char *msg = data->msg;
-//        int *s = data->s;
-        unsigned int port = 3000;
-        int s = openSocket(port);
-        setNonBlock(s);
         
+        int lr = listen(s, 5);
+        printf("lr %d\n", lr);
         printf("chlid %d %d %p %s\n", getpid(), s, &s, msg);
         // 注册事件
+        
         initLuaEnv();
         updateEvents(epollfd, s, GwKQueueFilterRead | GwKQueueFilterWrite, GwKQueueFlagAdd);
         // run worker
-        GwWorkerRun(epollfd, s);
+//        GwWorkerRun(epollfd, s);
         
     } else {
         // parent
-        GwShmData *data = malloc(sizeof(GwShmData));
-        data->msg = "abcd hello";
-        data->s = 12;
-    
         printf("parents %d %d %p\n", getpid(), data->s, &data->s);
-        GwShmWriteData(shm, data);
         wait(NULL);
     }
  

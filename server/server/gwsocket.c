@@ -49,11 +49,11 @@ openSocket(unsigned short port) {
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
     serveraddr.sin_port = htons(port);
+    // bind，成功返回0，出错返回-1
+    int br = bind(s, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
+//    int lr = listen(s, 5);
     //
-    bind(s, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
-    listen(s, 5);
-    //
-    printf("listening at port %d\n", port);
+    printf("listening at port %d %d\n", port, br);
     return s;
     
 }
@@ -119,9 +119,9 @@ response(void *socketFile){
     int s = *(int *)socketFile;
     
 //    // 创建 lua 运行环境
-    lua_State *L = luaL_newstate();
-    // 加载 lua 标准库
-    luaL_openlibs(L);
+//    lua_State *L = luaL_newstate();
+//    // 加载 lua 标准库
+//    luaL_openlibs(L);
     
     // 载入 lua 文件并执行
     printf("response\n");
@@ -136,7 +136,7 @@ response(void *socketFile){
     // add 函数中调用了一个 lua 中的函数
     const char *message = responseFromLua(L, r);
     
-    lua_close(L);
+//    lua_close(L);
     
     write(s , message , strlen(message));
 //    printf("s: %u %s\n", (unsigned int)s, message);
