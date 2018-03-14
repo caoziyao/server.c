@@ -93,8 +93,8 @@ loopOnce(int efd, int lfd, int waitms, GuaThreadPool *pool){
         }  else if (filter == EVFILT_WRITE) {
             a++;
             // write
-//            response(&ev_fd);
-            GuaThreadPoolAddTask(pool, response, ev_fd);
+            response(&ev_fd);
+//            GuaThreadPoolAddTask(pool, response, (void *)&ev_fd);
             // 实际应用应当实现可写时写出数据，无数据可写才关闭可写事件
             // updateEvents(efd, ev_fd, GwKQueueFilterWrite, GwKQueueFlagDelete);
             

@@ -35,7 +35,7 @@ initLuaEnv();
 void
 closeLuaEnv();
 
-int
+int 
 openSocket(unsigned short port);
 
 void

@@ -23,6 +23,10 @@
 
 // 启动worker进程
 void
-GwStartMaster();
+GwMasterStart();
+
+// fork 新进程
+void
+GwMasterFork(pid_t *pid);
 
 #endif /* master_h */

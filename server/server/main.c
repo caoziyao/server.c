@@ -1,21 +1,12 @@
 //
 //  main.c
 // cc *.c -Ilua-5.3.4/src -llua -Llua-5.3.4/src && ./a.out
-// test:  siege -c 100 -r 10 http://127.0.0.1:3000/
+// test:  siege -c 10 -r 1000 http://127.0.0.1:3000/
 
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-//#include <sys/socket.h>
-//#include <arpa/inet.h>
-//#include <unistd.h>
-//#include <pthread.h>
-//#include <stdbool.h>
-//#include <string.h>
-//#include <unistd.h>
-//#include <sys/wait.h>
-//#include <sys/types.h>
 
 #include "threadpool.h"
 #include "gwsocket.h"
@@ -24,80 +15,49 @@
 #include "master.h"
 #include "worker.h"
 #include "gwpipe.h"
+#include "gwshm.h"
 
 int
 main(int argc, const char *argv[]) {
     
-    int *fd = GwPipeInit();
-    pid_t id = fork();
+    GwShm *shm = GwShmInit();
+    
+    pid_t id;
+    GwMasterFork(&id);
+    
+    int epollfd = initKqueue();
+    
     if (id < 0) {
         quit("fork()");
     } else if (id == 0) {
         // child
-        GwPipeClose(fd, EGwPipeRead);
-        int i = 0;
-        char *msg = NULL;
-        while (i < 100) {
-            msg = "I am child";
-            GwPipeWrite(fd, msg, strlen(msg));
-            sleep(1);
-            i++;
-        }
+        sleep(1);
+        
+        GwShmData *data = GwShmReadData(shm);
+        char *msg = data->msg;
+//        int *s = data->s;
+        unsigned int port = 3000;
+        int s = openSocket(port);
+        setNonBlock(s);
+        
+        printf("chlid %d %d %p %s\n", getpid(), s, &s, msg);
+        // 注册事件
+        initLuaEnv();
+        updateEvents(epollfd, s, GwKQueueFilterRead | GwKQueueFilterWrite, GwKQueueFlagAdd);
+        // run worker
+        GwWorkerRun(epollfd, s);
         
     } else {
         // parent
-         GwPipeClose(fd, EGwPipeWrite);
-        int j = 0;
-//        char rsp[100];
-        while (j < 100) {
-            char *rsp = GwPipeRead(fd);
-            printf("parent: %s\n", rsp);
-            j++;
-        }
-    }
-//    GwStartMaster();
+        GwShmData *data = malloc(sizeof(GwShmData));
+        data->msg = "abcd hello";
+        data->s = 12;
     
-//    int epollfd = initKqueue();
-//    initLuaEnv();
-//
-//    // socket
-//    unsigned int port = 3000;
-//    int s = openSocket(port);
-//    setNonBlock(s);
-//
-//    struct sockaddr_in client;
-//    int size = sizeof(struct sockaddr_in);
-//
-//    // 注册事件
-//    updateEvents(epollfd, s, GwKQueueFilterRead | GwKQueueFilterWrite, GwKQueueFlagAdd);
-//
-//
-//    int numOfPid = 4;
-//    pid_t pid;
-//    for (int i = 0; i < numOfPid; i++) {
-//        pid = fork();
-//        if (pid == 0 || pid == -1) {
-//            break;
-//        }
-//    }
-//
-//    if (pid < 0) {
-//        quit("fork()");
-//    } else if (pid == 0) {
-//        // chlidren
-//        GuaThreadPool *pool = GuaThreadPoolNew(5);
-////        GuaThreadPoolAddTask(pool, response, n);
-//        while (true) {
-//            loopOnce(epollfd, s, 10000, pool);
-//        }
-//        printf("chlid %d\n", getpid());
-//    } else {
-//        // parents
-//        wait(NULL);  // 等待子进程退出
-//        printf("parents %d\n", getpid());
-//    }
-//
-//    closeLuaEnv();
+        printf("parents %d %d %p\n", getpid(), data->s, &data->s);
+        GwShmWriteData(shm, data);
+        wait(NULL);
+    }
+ 
 
     return 0;
 }

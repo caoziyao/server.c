@@ -18,7 +18,10 @@
 #define worker_h
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-
+void
+GwWorkerRun(int fd, int socketFile);
 
 #endif /* worker_h */

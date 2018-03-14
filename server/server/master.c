@@ -10,6 +10,20 @@
 
 
 void
-GwStartMaster(){
+GwMasterStart(){
     
+}
+
+
+void
+GwMasterFork(pid_t *pid) {
+    int n = NumberOfWorker;
+    
+    pid_t *id = pid;
+    for (int i = 0; i < n; i++) {
+        *id = fork();
+        if (*id == 0 || *id == -1) {
+            break;
+        }
+    }
 }

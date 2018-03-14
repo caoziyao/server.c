@@ -9,7 +9,7 @@
 #ifndef config_h
 #define config_h
 
-#define NumberOfWorker 4    // worker进程数
+#define NumberOfWorker 2    // worker进程数
 
 
 #endif /* config_h */

@@ -7,8 +7,6 @@
 //
 
 #include "gwpipe.h"
-#include "config.h"
-#include "utils.h"
 
 int *
 GwPipeInit(){
@@ -17,7 +15,6 @@ GwPipeInit(){
     if (err < 0) {
         quit("pipe()");
     }
-    
     return p;
 }
 
@@ -28,16 +25,11 @@ GwPipeClose(int *fd, GwPipeFdEnd end){
 }
 
 
-char *
-GwPipeRead(int *fd) {
-    // todo 动态string
-    char *msg = malloc(sizeof(char) * 256);
-    memset(msg, '\0', 256);
-    
+void
+GwPipeRead(int *fd, char *msg, int n) {
+    memset(msg, '\0', n);
     int r = fd[EGwPipeRead];
-    read(r, msg, 256);
-    
-    return msg;
+    read(r, msg, n);
 }
 
 
@@ -47,6 +39,23 @@ GwPipeWrite(int *fd, char *msg, int n) {
         int w = fd[EGwPipeWrite];
         write(w, msg, n);
     }
+}
+
+// todo struct
+void
+GwPipeReadData(int *fd, void *s) {
+//    GwPipeData *data = (GwPipeData *)s;
+    int r = fd[EGwPipeRead];
+    read(r, s, sizeof(GwPipeData));
+}
+
+
+// todo struct
+void
+GwPipeWriteData(int *fd, void *s) {
+//    GwPipeData *data = (GwPipeData *)s;
+    int w = fd[EGwPipeWrite];
+    write(w, s, sizeof(GwPipeData) + 1);
 }
 
 

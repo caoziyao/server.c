@@ -33,7 +33,9 @@ setNonBlock(int fd){
 
 int
 openSocket(unsigned short port) {
+    
     int s = socket(AF_INET, SOCK_STREAM, 0);
+    
     if (s < 0) {
         quit("socket()");
     }
@@ -117,11 +119,12 @@ response(void *socketFile){
     int s = *(int *)socketFile;
     
 //    // 创建 lua 运行环境
-//    lua_State *L = luaL_newstate();
-//    // 加载 lua 标准库
-//    luaL_openlibs(L);
+    lua_State *L = luaL_newstate();
+    // 加载 lua 标准库
+    luaL_openlibs(L);
     
     // 载入 lua 文件并执行
+    printf("response\n");
     if(luaL_dofile(L, "server.lua")) {
         printf("LUA ERROR: %s\n", lua_tostring(L, -1));
         return NULL;
@@ -133,7 +136,7 @@ response(void *socketFile){
     // add 函数中调用了一个 lua 中的函数
     const char *message = responseFromLua(L, r);
     
-//    lua_close(L);
+    lua_close(L);
     
     write(s , message , strlen(message));
 //    printf("s: %u %s\n", (unsigned int)s, message);
