@@ -1,10 +1,7 @@
 //
 //  gwshm.h
 //  server
-//
-//  Created by working on 2018/3/14.
-//  Copyright © 2018年 working. All rights reserved.
-//
+
 
 #ifndef gwshm_h
 #define gwshm_h
@@ -27,6 +24,8 @@ struct _GwShmData {
     char *msg;
     int option;
     struct sockaddr_in serveraddr;
+    int child[NumberOfWorker];
+    int n;
 };
 
 struct _GwShm {

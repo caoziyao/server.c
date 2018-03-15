@@ -21,12 +21,12 @@ void
 setNonBlock(int fd){
     int flags = fcntl(fd, F_GETFL, 0);
     if (flags < 0) {
-        quit("fcntl()");
+        quit("fcntl()1");
     }
     int r = fcntl(fd, F_SETFL, flags | O_NONBLOCK);
     
     if (r < 0) {
-        quit("fcntl()");
+        quit("fcntl()2");
     }
 }
 

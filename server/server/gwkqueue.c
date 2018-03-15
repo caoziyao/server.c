@@ -56,7 +56,6 @@ updateEvents(int efd, int fd, GwKQueueFilter filter, GwKQueueFlag flag) {
 }
 
 
-static int a = 0;
 void
 loopOnce(int efd, int lfd, int waitms, GuaThreadPool *pool){
     struct timespec timeout;
@@ -68,7 +67,7 @@ loopOnce(int efd, int lfd, int waitms, GuaThreadPool *pool){
     
     // 进行kevent函数调用
     int n = kevent(efd, NULL, 0, activeEvs, kMaxEvents, &timeout);
-//    printf("epoll_wait %d %d\n", n, a);
+    printf("epoll_wait %d\n", n);
     
     for (int i = 0; i < n; i++) {
         // 一个个取出已经就绪的事件
@@ -84,14 +83,13 @@ loopOnce(int efd, int lfd, int waitms, GuaThreadPool *pool){
             if (ev_fd == lfd) {
                 // accept
                 int cfd = handleAccept(ev_fd);
-                setNonBlock(cfd);
+//                setNonBlock(cfd);
                 updateEvents(efd,  cfd, GwKQueueFilterRead | GwKQueueFilterWrite, GwKQueueFlagAdd);
             } else {
                 // read
                 handleRead(ev_fd);
             }
         }  else if (filter == EVFILT_WRITE) {
-            a++;
             // write
             response(&ev_fd);
 //            GuaThreadPoolAddTask(pool, response, (void *)&ev_fd);

@@ -22,7 +22,7 @@ typedef enum _GwPipeFdEnd {
 }GwPipeFdEnd;
 
 typedef struct _GwPipeData {
-    int *s;
+    int s;
     char *msg;
 }GwPipeData;
 

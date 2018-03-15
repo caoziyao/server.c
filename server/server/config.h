@@ -9,7 +9,7 @@
 #ifndef config_h
 #define config_h
 
-#define NumberOfWorker 3    // worker进程数
+#define NumberOfWorker 2    // worker进程数
 //宏前面加上##的作用在于：当可变参数的个数为0时，这里的## 起到把前面多余的","去掉的作用
 
 #define log(format, ...) printf("[logging] %s(%d): \n%s", \

@@ -2,9 +2,7 @@
 //  gwshm.c
 //  server
 //
-//  Created by working on 2018/3/14.
-//  Copyright © 2018年 working. All rights reserved.
-//
+
 #define TEXT_SZ 2048
 
 #include "gwshm.h"
@@ -32,7 +30,6 @@ GwShmInit(){
     }
     shmptr->size = size;
     shmptr->shmid = shmid;
-//    shmptr->data = NULL;
     
 //    shm->shmptr = shmptr;
 //    shm->shmid = shmid;

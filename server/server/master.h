@@ -19,6 +19,10 @@
 #define master_h
 
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
 #include "config.h"
 
 // 启动worker进程

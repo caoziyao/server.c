@@ -16,24 +16,33 @@
 #include "worker.h"
 #include "gwpipe.h"
 #include "gwshm.h"
+#include "gwmonitor.h"
 
 int
 main(int argc, const char *argv[]) {
 
-    GwShm *shm = GwShmInit();
+//    GwShm *shm = GwShmInit();
     
     unsigned int port = 3000;
     int s = openSocket(port);
     setNonBlock(s);
-    
-    GwShmData *data = &shm->data;
-    data->s = s;
-    data->msg = "hello msg";
-    
+
     // 新进程
     pid_t id;
-    GwMasterFork(&id);
+    GwMonitorData *monitorData = malloc(sizeof(GwMonitorData));
+    monitorData->n = -1;
+    int n = NumberOfWorker;
     
+    for (int i = 0; i < n; i++) {
+        id = fork();
+        if (id == 0 || id == -1) {
+            break;
+        }
+        GwMonitorAddPid(monitorData, id);
+        printf("ffid %d\n", id);
+    }
+    
+//    GwMasterFork(&id);
     // kqueue
     int epollfd = initKqueue();
     
@@ -41,27 +50,31 @@ main(int argc, const char *argv[]) {
         quit("fork()");
     } else if (id == 0) {
         // child
-        sleep(1);
-        GwShmData *data = &shm->data;
-        int s = data->s;
-        char *msg = data->msg;
+        int childid = getpid();
         
         int lr = listen(s, 5);
         printf("lr %d\n", lr);
-        printf("chlid %d %d %p %s\n", getpid(), s, &s, msg);
+        printf("chlid %d %d %p\n", getpid(), s, &s);
         // 注册事件
         
         initLuaEnv();
         updateEvents(epollfd, s, GwKQueueFilterRead | GwKQueueFilterWrite, GwKQueueFlagAdd);
         // run worker
 //        GwWorkerRun(epollfd, s);
+//        while (1) {
+//            ;
+//        }
+        sleep(1);
+        printf("1\n");
+        exit(2);
         
     } else {
         // parent
-        printf("parents %d %d %p\n", getpid(), data->s, &data->s);
-        wait(NULL);
+        sleep(15);
+        printf("2\n");
+        GwMonitorRun(monitorData);
+
     }
- 
 
     return 0;
 }
