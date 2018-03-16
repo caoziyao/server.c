@@ -9,6 +9,7 @@
 #include "gwconnection.h"
 #include "utils.h"
 #include "gwlua.h"
+#include "config.h"
 
 typedef struct _GwConnection GwConnection;
 struct _GwConnection{
@@ -59,14 +60,14 @@ GwConnSetNonBlock(int fd) {
 
 
 void *
-response(void *socketFile){
+GwConnResponse(void *socketFile){
     int s = *(int *)socketFile;
     
-    char r[1024];
+    char r[MaxRecvBuff];
     read(s, r, sizeof(r));
     
     // add 函数中调用了一个 lua 中的函数
-    const char *message = GuwLuaExecl("server.lua", r);
+    const char *message = GuwLuaExecl("server_lua/server.lua", r);
     
     write(s , message , strlen(message));
     //    printf("s: %u %s\n", (unsigned int)s, message);

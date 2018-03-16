@@ -16,6 +16,7 @@
 
 static lua_State *L;
 
+
 void
 GwLuaInitEnv(){
     
@@ -30,6 +31,7 @@ void
 GwLuaCloseEnv(){
     lua_close(L);
 }
+
 
 // 加载文件
 void *

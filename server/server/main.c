@@ -20,7 +20,6 @@
 #include "gwconnection.h"
 #include "gwlua.h"
 
-
 int
 main(int argc, const char *argv[]) {
 
@@ -33,8 +32,6 @@ main(int argc, const char *argv[]) {
     // master
     GwMaster *master = GwMasterInit();
     int id = master->ret;
-    
-    int epollfd = initKqueue();
     
     if (id < 0) {
         quit("GwMasterInit()");
@@ -50,6 +47,7 @@ main(int argc, const char *argv[]) {
             int wif = WIFEXITED(status); // 子进程是否为正常退出的，如果是，它会返回一个非零值
             printf("status: %d %d %d\n", i, wif, wpid);
         }
+        GwLuaCloseEnv();
         printf("over master\n");
     }
     

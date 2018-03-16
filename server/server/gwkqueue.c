@@ -45,7 +45,7 @@ Accept(int kq, int connSize, int socketFile) {
 void
 Receive(int sock, int availBytes) {
     // todo 加入缓冲队列 EVFILT_WRITE
-    response(&sock);
+    GwConnResponse(&sock);
 }
 
 
@@ -58,7 +58,7 @@ GwKqueueHandleEvent(int kq, struct kevent* events, int nevents, int socketFile) 
         // 对于流 socket，data 表示协议栈 socket 层的接收缓冲区可读数据的字节数
         int data = events[i].data;
         
-        printf("sock data %d %d\n", sock, data);
+        printf("sock data %d %d %d\n", sock, data, getpid());
         if (sock == socketFile) {
             Accept(kq, data, socketFile);
         } else {

@@ -10,8 +10,10 @@
 #define config_h
 
 #define NumberOfWorker 2    // worker进程数
-//宏前面加上##的作用在于：当可变参数的个数为0时，这里的## 起到把前面多余的","去掉的作用
+#define MaxEventCount 5000  // kqueue event 数
+#define MaxRecvBuff 65535
 
+//宏前面加上##的作用在于：当可变参数的个数为0时，这里的## 起到把前面多余的","去掉的作用
 #define log(format, ...) printf("[logging] %s(%d): \n%s", \
                                 __FUNCTION__, __LINE__, ##__VA_ARGS__);
 

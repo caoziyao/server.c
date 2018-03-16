@@ -35,6 +35,6 @@ void
 GwConnCloseLuaEnv();
 
 void *
-response(void *socketFile);
+GwConnResponse(void *socketFile);
 
 #endif /* gwconnection_h */
