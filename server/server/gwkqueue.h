@@ -30,13 +30,17 @@
 int
 initKqueue();
 
-void
-updateEvents(int efd, int fd, GwKQueueFilter filter, GwKQueueFlag flag);
+// 注册事件到 kqueue
+bool
+GwKqueueRegister(int kq, int fd);
 
+// 等待内核事件通知
 void
-initEvent(int efd, int fd);
+GwKqueueWaitEvent(int kq);
 
+// 处理事件
 void
-loopOnce(int efd, int lfd, int waitms, GuaThreadPool *pool);
+GwKqueueHandleEvent(int kq, struct kevent* events, int nevents, int socketFile);
+
 
 #endif /* guakqueue_h */

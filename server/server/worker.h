@@ -22,6 +22,6 @@
 #include <unistd.h>
 
 void
-GwWorkerRun(int fd, int socketFile);
+GwWorkerRun(int socketFile);
 
 #endif /* worker_h */

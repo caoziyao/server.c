@@ -2,9 +2,6 @@
 //  master.c
 //  server
 //
-//  Created by working on 2018/3/13.
-//  Copyright © 2018年 working. All rights reserved.
-//
 
 #include "master.h"
 
@@ -15,16 +12,23 @@ GwMasterStart(){
 }
 
 
-void
-GwMasterFork(pid_t *pid) {
+GwMaster *
+GwMasterInit() {
     int n = NumberOfWorker;
-
-    pid_t *id = pid;
+    pid_t id = -1;
+    
+    GwMaster *m = malloc(sizeof(GwMaster));
+    
     for (int i = 0; i < n; i++) {
-        *id = fork();
-        if (*id == 0 || *id == -1) {
+        id = fork();
+        if (id == 0 || id == -1) {
             break;
         }
-        printf("ffid %d\n", *id);
+        printf("fork id %d\n", id);
+        m->workerId[i] = id;
     }
+    m->ret = id;
+    
+    return m;
 }
+

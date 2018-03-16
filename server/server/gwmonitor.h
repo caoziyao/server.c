@@ -14,16 +14,20 @@
 #include <sys/wait.h>
 #include "config.h"
 
-typedef struct _GwMonitorData{
+typedef struct _GwMonitor GwMonitor;
+struct _GwMonitor{
     int chlidId[NumberOfWorker];
     int n;
-}GwMonitorData;
+};
+
+GwMonitor *
+GwMonitorInit();
 
 void
-GwMonitorAddPid(GwMonitorData *data, int pid);
+GwMonitorAddPid(GwMonitor *monitor, int pid);
 
 void
-GwMonitorRun(GwMonitorData *data);
+GwMonitorRun(GwMonitor *monitor);
 
 
 #endif /* gwmonitor_h */

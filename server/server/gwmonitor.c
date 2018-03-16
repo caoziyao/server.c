@@ -16,16 +16,22 @@
 #include "gwmonitor.h"
 
 
-void
-GwMonitorAddPid(GwMonitorData *data, int pid){
-    data->n++;
-    int n = data->n;
-    data->chlidId[n] = pid;
+GwMonitor *
+GwMonitorInit() {
+    return NULL;
 }
 
 
 void
-GwMonitorRun(GwMonitorData *data) {
+GwMonitorAddPid(GwMonitor *monitor, int pid){
+    monitor->n++;
+    int n = monitor->n;
+    monitor->chlidId[n] = pid;
+}
+
+
+void
+GwMonitorRun(GwMonitor *monitor) {
     int wpid, status;
     while ((wpid = wait(&status)) > 0) {
         int i = WEXITSTATUS(status); // 进程的返回值

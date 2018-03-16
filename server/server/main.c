@@ -9,7 +9,6 @@
 #include <unistd.h>
 
 #include "threadpool.h"
-#include "gwsocket.h"
 #include "gwkqueue.h"
 #include "config.h"
 #include "master.h"
@@ -18,63 +17,41 @@
 #include "gwshm.h"
 #include "gwmonitor.h"
 
+#include "gwconnection.h"
+#include "gwlua.h"
+
+
 int
 main(int argc, const char *argv[]) {
 
-//    GwShm *shm = GwShmInit();
-    
+    // socket
     unsigned int port = 3000;
-    int s = openSocket(port);
-    setNonBlock(s);
-
-    // 新进程
-    pid_t id;
-    GwMonitorData *monitorData = malloc(sizeof(GwMonitorData));
-    monitorData->n = -1;
-    int n = NumberOfWorker;
+    int s = GwConnOpenSocket(port);
+    GwConnSetNonBlock(s);
+    GwLuaInitEnv();
     
-    for (int i = 0; i < n; i++) {
-        id = fork();
-        if (id == 0 || id == -1) {
-            break;
-        }
-        GwMonitorAddPid(monitorData, id);
-        printf("ffid %d\n", id);
-    }
+    // master
+    GwMaster *master = GwMasterInit();
+    int id = master->ret;
     
-//    GwMasterFork(&id);
-    // kqueue
     int epollfd = initKqueue();
     
     if (id < 0) {
-        quit("fork()");
+        quit("GwMasterInit()");
     } else if (id == 0) {
-        // child
-        int childid = getpid();
-        
-        int lr = listen(s, 5);
-        printf("lr %d\n", lr);
-        printf("chlid %d %d %p\n", getpid(), s, &s);
-        // 注册事件
-        
-        initLuaEnv();
-        updateEvents(epollfd, s, GwKQueueFilterRead | GwKQueueFilterWrite, GwKQueueFlagAdd);
-        // run worker
-//        GwWorkerRun(epollfd, s);
-//        while (1) {
-//            ;
-//        }
-        sleep(1);
-        printf("1\n");
-        exit(2);
-        
+        printf("chlid %d %d\n", getpid(), s);
+        GwWorkerRun(s);
     } else {
-        // parent
-        sleep(15);
-        printf("2\n");
-        GwMonitorRun(monitorData);
-
+        // todo monitor
+        printf("parent %d\n", getpid());
+        int wpid, status;
+        while ((wpid = wait(&status)) > 0) {
+            int i = WEXITSTATUS(status); // 进程的返回值
+            int wif = WIFEXITED(status); // 子进程是否为正常退出的，如果是，它会返回一个非零值
+            printf("status: %d %d %d\n", i, wif, wpid);
+        }
+        printf("over master\n");
     }
-
+    
     return 0;
 }

@@ -8,19 +8,27 @@
 
 #include "worker.h"
 #include "threadpool.h"
-#include "gwsocket.h"
 #include "gwkqueue.h"
 #include "gwpipe.h"
 #include "config.h"
+#include "gwconnection.h"
+
 
 void
-GwWorkerRun(int fd, int socketFile) {
+GwWorkerRun(int socketFile) {
+    int fd = initKqueue();
     int s = socketFile;
-//    printf("chlid %d\n", getpid());
+    
     GuaThreadPool *pool = GuaThreadPoolNew(2);
-    //        GuaThreadPoolAddTask(pool, response, n);
+    //  GuaThreadPoolAddTask(pool, response, n);
+    // 注册
+    GwKqueueRegister(fd, s);
+    struct kevent events[5000];
+    
     while (true) {
-        loopOnce(fd, s, 10000, pool);
+        int ret = kevent(fd, NULL, 0, events, 5000, NULL);
+        printf("ret %d\n", ret);
+        GwKqueueHandleEvent(fd, events, ret, s);
     }
     
 }

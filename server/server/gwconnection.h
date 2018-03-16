@@ -1,10 +1,10 @@
 //
-//  gwsocket.h
+//  gwconnection.h
 //  server
-//
 
-#ifndef gwsocket_h
-#define gwsocket_h
+
+#ifndef gwconnection_h
+#define gwconnection_h
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,32 +22,19 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#include "utils.h"
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
 
-
-
-void
-initLuaEnv();
-
-void
-closeLuaEnv();
-
-int 
-openSocket(unsigned short port);
-
-void
-setNonBlock(int fd);
-
+// 绑定 socket
 int
-handleAccept(int socketFile);
+GwConnOpenSocket(unsigned short port);
+
+// 设置非阻塞
+void
+GwConnSetNonBlock(int fd);
 
 void
-handleRead(int socketFile);
+GwConnCloseLuaEnv();
 
 void *
 response(void *socketFile);
 
-#endif /* gwsocket_h */
+#endif /* gwconnection_h */

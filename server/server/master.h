@@ -1,10 +1,7 @@
 //
 //  master.h
 //  server
-//
-//  Created by working on 2018/3/13.
-//  Copyright © 2018年 working. All rights reserved.
-//
+
 
 /*
  master进程管理worker进程
@@ -19,18 +16,28 @@
 #define master_h
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 #include "config.h"
 
+typedef struct _GwMaster GwMaster;
+struct _GwMaster{
+    int workerId[NumberOfWorker];
+    int ret;
+};
+
 // 启动worker进程
 void
 GwMasterStart();
 
 // fork 新进程
-void
-GwMasterFork(pid_t *pid);
+int
+GwMasterFork();
+
+GwMaster *
+GwMasterInit();
 
 #endif /* master_h */

@@ -4,8 +4,9 @@
 
 
 #include "gwkqueue.h"
-#include "gwsocket.h"
-
+//#include "gwsocket.h"
+#include "gwconnection.h"
+#define MAX_EVENT_COUNT 5000
 const static int FdNum = 2;         // 两个文件描述符
 
 
@@ -18,110 +19,54 @@ initKqueue(){
     return fd;
 }
 
-
-int
-updateEventsType(struct kevent *ev, int type,  int n, int fd, GwKQueueFilter filter, GwKQueueFlag flag){
+// Register 将 fd 注册到 kq 中。
+// 注册的方法是通过 kevent() 将 eventlist 和 neventlist 置成 NULL 和 0 来达到的。
+bool
+GwKqueueRegister(int kq, int fd) {
+    struct kevent changes[1];
+    EV_SET(&changes[0], fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
     
-    if ((flag & GwKQueueFlagAdd) || (flag & GwKQueueFlagEnable)) {
-        EV_SET(&ev[n++], fd, type, EV_ADD|EV_ENABLE, 0, 0, (void*)(intptr_t)fd);
-    } else if (flag & GwKQueueFlagDelete) {
-        EV_SET(&ev[n++], fd, type, EV_DELETE, 0, 0, (void*)(intptr_t)fd);
-    } else {
-        quit("unknow updateEvents() flag ");
-    }
-    return n;
+    // changelist: 要注册 / 反注册的事件数组； nchanges: changelist 的元素个数
+    int ret = kevent(kq, changes, 1, NULL, 0, NULL);
+    return true;
 }
 
 
 void
-updateEvents(int efd, int fd, GwKQueueFilter filter, GwKQueueFlag flag) {
-    struct kevent ev[FdNum];
-    int n = 0;
-    int type;
-    
-    if (filter & GwKQueueFilterRead) {
-        type = EVFILT_READ;
-        n = updateEventsType(ev, type,  n, fd, filter, flag);
-    }
-    
-    if (filter & GwKQueueFilterWrite) {
-        type = EVFILT_WRITE;
-        n = updateEventsType(ev, type,  n, fd, filter, flag);
-    }
-    
-    int r = kevent(efd, ev, n, NULL, 0, NULL);
-    if (r < 0) {
-        quit("updateEvents()");
+Accept(int kq, int connSize, int socketFile) {
+    for (int i = 0; i < connSize; i++) {
+        int client = accept(socketFile, NULL, NULL);
+        // 将 accept 成功的 socket 注册到 kq
+        GwKqueueRegister(kq, client);
     }
 }
 
 
 void
-loopOnce(int efd, int lfd, int waitms, GuaThreadPool *pool){
-    struct timespec timeout;
-    timeout.tv_sec = waitms / 1000;
-    timeout.tv_nsec = (waitms % 1000) * 1000 * 1000;
-    
-    const int kMaxEvents = 20;
-    struct kevent activeEvs[kMaxEvents];
-    
-    // 进行kevent函数调用
-    int n = kevent(efd, NULL, 0, activeEvs, kMaxEvents, &timeout);
-    printf("epoll_wait %d\n", n);
-    
-    for (int i = 0; i < n; i++) {
-        // 一个个取出已经就绪的事件
-        struct kevent event = activeEvs[i];
-        if( event.flags & EV_ERROR ){
-            quit("Event error");
-        }
+Receive(int sock, int availBytes) {
+    // todo 加入缓冲队列 EVFILT_WRITE
+    response(&sock);
+}
+
+
+void
+GwKqueueHandleEvent(int kq, struct kevent* events, int nevents, int socketFile) {
+    for (int i = 0; i < nevents; i++) {
+        int sock = events[i].ident;
         
-        // 从附加数据里面取回文件描述符的值
-        int ev_fd = (int)(intptr_t)event.udata;
-        int filter = event.filter;
-        if (filter == EVFILT_READ) {
-            if (ev_fd == lfd) {
-                // accept
-                int cfd = handleAccept(ev_fd);
-//                setNonBlock(cfd);
-                updateEvents(efd,  cfd, GwKQueueFilterRead | GwKQueueFilterWrite, GwKQueueFlagAdd);
-            } else {
-                // read
-                handleRead(ev_fd);
-            }
-        }  else if (filter == EVFILT_WRITE) {
-            // write
-            response(&ev_fd);
-//            GuaThreadPoolAddTask(pool, response, (void *)&ev_fd);
-            // 实际应用应当实现可写时写出数据，无数据可写才关闭可写事件
-            // updateEvents(efd, ev_fd, GwKQueueFilterWrite, GwKQueueFlagDelete);
-            
+        // 对于监听 socket, data 表示连接完成队列中的元素 ( 已经收到三次握手最后一个 ACK) 个数
+        // 对于流 socket，data 表示协议栈 socket 层的接收缓冲区可读数据的字节数
+        int data = events[i].data;
+        
+        printf("sock data %d %d\n", sock, data);
+        if (sock == socketFile) {
+            Accept(kq, data, socketFile);
         } else {
-            printf("unknow event");
+            Receive(sock, data);
         }
-        
     }
 }
 
 
-//void
-//kqueueTest(){
-    // kqueue
-    //    int epollfd = initKqueue();
-    //
-    //    // socket
-    //    unsigned int port = 3000;
-    //    int s = openSocket(port);
-    //    setNonBlock(s);
-    //
-    //    struct sockaddr_in client;
-    //    int size = sizeof(struct sockaddr_in);
-    //
-    //    // 注册事件
-    //    updateEvents(epollfd, s, GwKQueueFilterRead | GwKQueueFilterWrite, GwKQueueFlagAdd);
-    //
-    //    while (true) {
-    //        loopOnce(epollfd, s, 10000);
-    //    }
-//}
+
 
