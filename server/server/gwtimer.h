@@ -10,14 +10,17 @@
 #define gwtimer_h
 
 #include <stdio.h>
+#include <sys/time.h>
+#include <signal.h>
+#include <stdlib.h>
 
 // 定时到期函数
-typedef void (*GwTimerExpiryAction)(void *args);
+typedef void (*GwTimerExpiryAction)(int n);
 
 // 注册一个时间间隔为 Interval 后执行 ExpiryAction 的定时器实例
 // 返回 TimerId
 int
-GwTimerStart(int interval, GwTimerExpiryAction *action);
+GwTimerStart(int interval, void *action);
 
 // 根据 timerId 找到注册的定时器实例并执行 Stop
 void

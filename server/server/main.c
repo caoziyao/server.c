@@ -28,27 +28,45 @@ main(int argc, const char *argv[]) {
     int s = GwConnOpenSocket(port);
     GwConnSetNonBlock(s);
     GwLuaInitEnv();
-    
+
+    // shm 
+    int shmid = GwShmInit();
+    printf("shmid %d\n", shmid);
+    GwShm *shm = GwShmat(shmid);
+    GwShmMutex *mtx = &shm->mutexData;
+    mtx->num = 0;
+    GwMutexCreate(mtx, EnumGwMutexShared);
+
     // master
     GwMaster *master = GwMasterInit();
-    int id = master->ret;
+    master->shm = shm;
     
+    int id = master->ret;
     if (id < 0) {
+        GwShmRemove(shmid);
         quit("GwMasterInit()");
+        
     } else if (id == 0) {
         printf("chlid %d %d\n", getpid(), s);
-        GwWorkerRun(s);
+        GwMasterStartWorker(master, s);
+        // GwWorkerRun(s);
+        GwShmdt(shm);
+
     } else {
         // todo monitor
         printf("parent %d\n", getpid());
         int wpid, status;
         while ((wpid = wait(&status)) > 0) {
-            int i = WEXITSTATUS(status); // 进程的返回值
-            int wif = WIFEXITED(status); // 子进程是否为正常退出的，如果是，它会返回一个非零值
+            int i = WEXITSTATUS(status);    // 进程的返回值
+            int wif = WIFEXITED(status);    // 子进程是否为正常退出的，如果是，它会返回一个非零值
             printf("status: %d %d %d\n", i, wif, wpid);
         }
         GwLuaCloseEnv();
-        printf("over master\n");
+        
+        GwMutexDestroy(mtx);
+        GwShmRemove(shmid);
+        printf("master over\n");
+        
     }
     
     return 0;

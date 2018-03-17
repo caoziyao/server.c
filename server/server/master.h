@@ -22,22 +22,27 @@
 #include <unistd.h>
 
 #include "config.h"
+#include "gwshm.h"
+#include "worker.h"
 
 typedef struct _GwMaster GwMaster;
+
+// 定义 worker
+typedef void (*GwWorkerAction)(GwMaster *master, int socketFile);
+
 struct _GwMaster{
     int workerId[NumberOfWorker];
     int ret;
+    GwShm *shm;
+    GwWorkerAction action;
 };
+
+// 初始化 master
+GwMaster *
+GwMasterInit();
 
 // 启动worker进程
 void
-GwMasterStart();
-
-// fork 新进程
-int
-GwMasterFork();
-
-GwMaster *
-GwMasterInit();
+GwMasterStartWorker(GwMaster *master, int socketFile);
 
 #endif /* master_h */

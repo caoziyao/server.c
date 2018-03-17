@@ -30,9 +30,13 @@
 int
 initKqueue();
 
-// 注册事件到 kqueue
+// 注册事件到 kqueue  Register
 bool
-GwKqueueRegister(int kq, int fd);
+GwKqueueAddListener(int kq, int fd);
+
+// 删除事件
+bool
+GwKqueueRemoveListener(int kq, int fd);
 
 // 等待内核事件通知
 void

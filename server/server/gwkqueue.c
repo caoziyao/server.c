@@ -22,7 +22,7 @@ initKqueue(){
 // Register 将 fd 注册到 kq 中。
 // 注册的方法是通过 kevent() 将 eventlist 和 neventlist 置成 NULL 和 0 来达到的。
 bool
-GwKqueueRegister(int kq, int fd) {
+GwKqueueAddListener(int kq, int fd) {
     struct kevent changes[1];
     EV_SET(&changes[0], fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
     
@@ -37,7 +37,7 @@ Accept(int kq, int connSize, int socketFile) {
     for (int i = 0; i < connSize; i++) {
         int client = accept(socketFile, NULL, NULL);
         // 将 accept 成功的 socket 注册到 kq
-        GwKqueueRegister(kq, client);
+        GwKqueueAddListener(kq, client);
     }
 }
 

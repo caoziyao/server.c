@@ -1,10 +1,7 @@
 //
 //  worker.h
 //  server
-//
-//  Created by working on 2018/3/13.
-//  Copyright © 2018年 working. All rights reserved.
-//
+
 
 /*
  worker进程来处理基本的网络事件
@@ -22,6 +19,6 @@
 #include <unistd.h>
 
 void
-GwWorkerRun(int socketFile);
+GwWorkerRun(int shmid, int socketFile);
 
 #endif /* worker_h */

@@ -2,10 +2,6 @@
 //  worker.c
 //  server
 //
-//  Created by working on 2018/3/13.
-//  Copyright © 2018年 working. All rights reserved.
-//
-
 /*
  惊群：
  利用一把进程间锁，每个进程中都尝试获得这把锁，
@@ -19,21 +15,47 @@
 #include "gwpipe.h"
 #include "config.h"
 #include "gwconnection.h"
+#include "gwtimer.h"
+#include "gwshm.h"
+#include "gwmutex.h"
 
-void
-GwWorkerRun(int socketFile) {
-    int fd = initKqueue();
-    int s = socketFile;
-    
-    GuaThreadPool *pool = GuaThreadPoolNew(2);
-    //  GuaThreadPoolAddTask(pool, response, n);
-    //
+static int fd;
+static int s;
+GwShmMutex *mtx;
+
+void *
+signal_handler(int n)
+{
+    (mtx->num)++;
+    printf("-child----------num++ %d  %d\n", getpid(), mtx->num);
+
     // 注册事件，让每个进程轮流监听 socket
     //1、获得锁则加入wait集合
     //2、没有获得则去除
-    GwKqueueRegister(fd, s);
-    struct kevent events[MaxEventCount];
+    GwMutexLock(mtx);
+    GwKqueueAddListener(fd, s);
+    GwMutexUnlock(mtx);
+    return NULL;
+}
+
+
+void
+GwWorkerRun(int shmid, int socketFile) {
     
+    GwShm *shm = GwShmat(shmid);
+    mtx = &shm->mutexData;
+    
+    fd = initKqueue();
+    s = socketFile;
+    
+    // GuaThreadPool *pool = GuaThreadPoolNew(2);
+    //  GuaThreadPoolAddTask(pool, response, n);
+
+//    GwTimerStart(1, signal_handler);
+    GwKqueueAddListener(fd, s);
+
+    struct kevent events[MaxEventCount];
+    sleep(1);
     while (true) {
         int ret = kevent(fd, NULL, 0, events, MaxEventCount, NULL);
         printf("ret %d\n", ret);
