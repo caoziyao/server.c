@@ -23,6 +23,7 @@ static int fd;
 static int s;
 GwShmMutex *mtx;
 
+
 void *
 signal_handler(int n)
 {
@@ -42,8 +43,8 @@ signal_handler(int n)
 void
 GwWorkerRun(int shmid, int socketFile) {
     
-    GwShm *shm = GwShmat(shmid);
-    mtx = &shm->mutexData;
+//    GwShm *shm = GwShmat(shmid);
+//    mtx = &shm->mutexData;
     
     fd = initKqueue();
     s = socketFile;
@@ -51,8 +52,8 @@ GwWorkerRun(int shmid, int socketFile) {
     // GuaThreadPool *pool = GuaThreadPoolNew(2);
     //  GuaThreadPoolAddTask(pool, response, n);
 
-//    GwTimerStart(1, signal_handler);
     GwKqueueAddListener(fd, s);
+//    GwTimerStart(1, signal_handler);
 
     struct kevent events[MaxEventCount];
     sleep(1);

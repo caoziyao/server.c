@@ -61,12 +61,12 @@ main(int argc, const char *argv[]) {
             int wif = WIFEXITED(status);    // 子进程是否为正常退出的，如果是，它会返回一个非零值
             printf("status: %d %d %d\n", i, wif, wpid);
         }
-        GwLuaCloseEnv();
         
+        GwLuaCloseEnv();
         GwMutexDestroy(mtx);
         GwShmRemove(shmid);
-        printf("master over\n");
         
+        printf("master over\n");
     }
     
     return 0;

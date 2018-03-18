@@ -2,9 +2,6 @@
 //  gwconnection.c
 //  server
 //
-/*
- connection对tcp连接的封装，包括连接的socket，读事件，写事件
- */
 
 #include "gwconnection.h"
 #include "utils.h"
