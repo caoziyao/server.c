@@ -20,9 +20,11 @@
 #include "gwconnection.h"
 #include "gwlua.h"
 
+#include "gwstring.h"
+
 int
 main(int argc, const char *argv[]) {
-
+    
     // socket
     unsigned int port = 3000;
     int s = GwConnOpenSocket(port);
