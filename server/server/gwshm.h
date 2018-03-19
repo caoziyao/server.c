@@ -11,6 +11,7 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "config.h"
 #include "utils.h"

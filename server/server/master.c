@@ -7,12 +7,12 @@
 
 
 void
-_WorkerAction (GwMaster *master, int socketFile) {
-    int s = socketFile;
+_WorkerAction (GwMaster *master, GwConnection *conn) {
+//    int s = socketFile;
     GwShm *shm = master->shm;
     
     int shmid = shm->shmid;
-    GwWorkerRun(shmid, s);
+    GwWorkerRun(shmid, conn);
 }
 
 
@@ -40,8 +40,8 @@ GwMasterInit() {
 
 // 启动worker进程
 void
-GwMasterStartWorker(GwMaster *master, int socketFile) {
-    master->action(master, socketFile);
+GwMasterStartWorker(GwMaster *master, GwConnection *conn) {
+    master->action(master, conn);
 }
 
 

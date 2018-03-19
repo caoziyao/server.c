@@ -2,6 +2,7 @@
 **/lua-5.3.4/*
 *.xml
 **/.idea/*
+lib/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

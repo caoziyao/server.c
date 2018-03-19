@@ -9,9 +9,13 @@
 #ifndef config_h
 #define config_h
 
-#define NumberOfWorker 2    // worker进程数
-#define MaxEventCount 5000  // kqueue event 数
-#define MaxRecvBuff 65535
+#include <stdlib.h>
+
+#define NumberOfWorker  1       // worker进程数
+#define MaxEventCount   5000    // kqueue event 数
+#define MaxRecvBuff     65535   // request 最大接收
+
+#define EnableHttpSSL   ssl    // 支持 ssl
 
 //宏前面加上##的作用在于：当可变参数的个数为0时，这里的## 起到把前面多余的","去掉的作用
 #define log(format, ...) printf("[logging] %s(%d): \n%s", \

@@ -34,7 +34,9 @@ GwKqueueAddListener(int kq, int fd) {
 
 
 void
-Accept(int kq, int connSize, int socketFile) {
+Accept(int kq, int connSize, GwConnection *conn) {
+    int socketFile = conn->server;
+    
     for (int i = 0; i < connSize; i++) {
         int client = accept(socketFile, NULL, NULL);
         // 将 accept 成功的 socket 注册到 kq
@@ -51,21 +53,42 @@ Receive(int sock, int availBytes) {
 
 
 void
-GwKqueueHandleEvent(int kq, struct kevent* events, int nevents, int socketFile) {
+ReceiveHttps(int sock, GwConnection *conn) {
+    SSL_CTX *ctx = conn->ctx;
+    SSL *ssl = SSL_new(ctx);
+    
+    SSL_set_fd(ssl, sock);
+    Servlet(ssl);
+    close(sock);
+}
+
+
+void
+GwKqueueHandleEvent(int kq, struct kevent* events, int nevents, GwConnection *conn) {
+    int socketFile = conn->server;
+    
     for (int i = 0; i < nevents; i++) {
         int sock = events[i].ident;
-        
         // 对于监听 socket, data 表示连接完成队列中的元素 ( 已经收到三次握手最后一个 ACK) 个数
         // 对于流 socket，data 表示协议栈 socket 层的接收缓冲区可读数据的字节数
         int data = events[i].data;
         
         printf("sock data %d %d %d\n", sock, data, getpid());
         if (sock == socketFile) {
-            Accept(kq, data, socketFile);
+            Accept(kq, data, conn);
         } else {
-            Receive(sock, data);
+            // http or https
+            if (conn->protocol == EnumProtocolHttp) {
+                printf("http\n");
+                Receive(sock, data);
+            } else if (conn->protocol == EnumProtocolHttps) {
+                printf("https\n");
+                ReceiveHttps(sock, conn);
+            } else {
+                printf("unknow protocol\n");
+            }
         }
-    }
+    }   
 }
 
 

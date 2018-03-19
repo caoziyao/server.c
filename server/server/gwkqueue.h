@@ -26,6 +26,7 @@
 #include "config.h"
 #include "constant.h"
 #include "threadpool.h"
+#include "gwconnection.h"
 
 int
 initKqueue();
@@ -44,7 +45,7 @@ GwKqueueWaitEvent(int kq);
 
 // 处理事件
 void
-GwKqueueHandleEvent(int kq, struct kevent* events, int nevents, int socketFile);
+GwKqueueHandleEvent(int kq, struct kevent* events, int nevents, GwConnection *conn);
 
 
 #endif /* guakqueue_h */

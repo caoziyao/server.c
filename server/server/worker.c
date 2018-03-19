@@ -14,7 +14,6 @@
 #include "gwkqueue.h"
 #include "gwpipe.h"
 #include "config.h"
-#include "gwconnection.h"
 #include "gwtimer.h"
 #include "gwshm.h"
 #include "gwmutex.h"
@@ -41,13 +40,13 @@ signal_handler(int n)
 
 
 void
-GwWorkerRun(int shmid, int socketFile) {
+GwWorkerRun(int shmid, GwConnection *conn) {
     
 //    GwShm *shm = GwShmat(shmid);
 //    mtx = &shm->mutexData;
+    int s = conn->server;
     
     fd = initKqueue();
-    s = socketFile;
     
     // GuaThreadPool *pool = GuaThreadPoolNew(2);
     //  GuaThreadPoolAddTask(pool, response, n);
@@ -60,7 +59,7 @@ GwWorkerRun(int shmid, int socketFile) {
     while (true) {
         int ret = kevent(fd, NULL, 0, events, MaxEventCount, NULL);
         printf("ret %d\n", ret);
-        GwKqueueHandleEvent(fd, events, ret, s);
+        GwKqueueHandleEvent(fd, events, ret, conn);
     }
     
 }

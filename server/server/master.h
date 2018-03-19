@@ -24,11 +24,12 @@
 #include "config.h"
 #include "gwshm.h"
 #include "worker.h"
+#include "gwconnection.h"
 
 typedef struct _GwMaster GwMaster;
 
 // 定义 worker
-typedef void (*GwWorkerAction)(GwMaster *master, int socketFile);
+typedef void (*GwWorkerAction)(GwMaster *master, GwConnection *conn);
 
 struct _GwMaster{
     int workerId[NumberOfWorker];
@@ -43,6 +44,6 @@ GwMasterInit();
 
 // 启动worker进程
 void
-GwMasterStartWorker(GwMaster *master, int socketFile);
+GwMasterStartWorker(GwMaster *master, GwConnection *conn);
 
 #endif /* master_h */

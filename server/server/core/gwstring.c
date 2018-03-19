@@ -7,14 +7,14 @@
 //
 
 // todo string 数据结构
-//data指向字符串数据的第一个字符，字符串的结束用长度来表示，而不是由’\0’来表示结束
+// data指向字符串数据的第一个字符，字符串的结束用长度来表示，而不是由’\0’来表示结束
 #include "gwstring.h"
 
 
 //typedef    unsigned char     u_char;
 struct _GwString {
     size_t len;
-    u_char *data;
+    char *data;
 };
 
 
@@ -23,10 +23,32 @@ GwString *
 GwStringStr(char *str) {
     GwString *s = malloc(sizeof(GwString));
     *s = (GwString) {
-        sizeof(str) - 1,
-        (u_char *) str
+//        sizeof(str) - 1,  // 可能出错
+        strlen(str),
+        (char *) str
     };
     return s;
+}
+
+
+// 初始化字符串为空字符串，符串的长度为0，data为NULL
+GwString *
+GwStringNullStr(char *str) {
+    return NULL;
+}
+
+
+// 字符串str为text，由于使用sizeof计算长度，故text必须为常量字符串
+GwString *
+GwStringSet(GwString *str, char *text) {
+    return NULL;
+}
+
+
+// 区分大小写的字符串比较，只比较前n个字符。
+GwString *
+GwStringnCmp(GwString *s1, GwString *s2, int n) {
+    return NULL;
 }
 
 

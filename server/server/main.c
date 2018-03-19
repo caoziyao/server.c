@@ -1,6 +1,6 @@
 //
 //  main.c
-// cc *.c -Ilua-5.3.4/src -llua -Llua-5.3.4/src && ./a.out
+// cc *.c core/*.c -Ilua-5.3.4/src  -llua -Llua-5.3.4/src -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib && ./a.out
 // test:  siege -c 10 -r 1000 http://127.0.0.1:3000/
 
 
@@ -20,15 +20,17 @@
 #include "gwconnection.h"
 #include "gwlua.h"
 
-#include "gwstring.h"
+#include "core/gwstring.h"
 
 int
 main(int argc, const char *argv[]) {
-    
+
     // socket
     unsigned int port = 3000;
-    int s = GwConnOpenSocket(port);
-    GwConnSetNonBlock(s);
+    GwConnection *conn = GwConnOpenSocket(port);
+//    GwConnection *conn = GwConnSSLOpenSocket(3001);
+    int s = conn->server;
+//    GwConnSetNonBlock(s);
     GwLuaInitEnv();
 
     // shm 
@@ -50,10 +52,10 @@ main(int argc, const char *argv[]) {
         
     } else if (id == 0) {
         printf("chlid %d %d\n", getpid(), s);
-        GwMasterStartWorker(master, s);
+        GwMasterStartWorker(master, conn);
         // GwWorkerRun(s);
         GwShmdt(shm);
-
+        
     } else {
         // todo monitor
         printf("parent %d\n", getpid());
@@ -64,6 +66,7 @@ main(int argc, const char *argv[]) {
             printf("status: %d %d %d\n", i, wif, wpid);
         }
         
+        GwConnSSLFree(conn);
         GwLuaCloseEnv();
         GwMutexDestroy(mtx);
         GwShmRemove(shmid);

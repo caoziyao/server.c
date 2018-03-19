@@ -18,7 +18,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "gwconnection.h"
+
 void
-GwWorkerRun(int shmid, int socketFile);
+GwWorkerRun(int shmid, GwConnection *conn);
 
 #endif /* worker_h */

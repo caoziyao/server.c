@@ -10,6 +10,8 @@
 #define utils_h
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 int
 quit(const char *msg);

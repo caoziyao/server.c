@@ -16,15 +16,31 @@
 #include <errno.h>
 #include <sys/event.h>
 #include <sys/types.h>
-#include <sys/time.h>
-#include <sys/select.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
+#include <resolv.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
-// 绑定 socket
-int
+typedef enum _EnumProtocol EnumProtocol;
+enum _EnumProtocol{
+    EnumProtocolHttp = 0,
+    EnumProtocolHttps = 1
+};
+
+// 封装 connection
+typedef struct _GwConnection GwConnection;
+struct _GwConnection{
+    unsigned short port;
+    int server;
+    SSL_CTX *ctx;
+    EnumProtocol protocol;
+};
+
+// create server socket
+GwConnection *
 GwConnOpenSocket(unsigned short port);
 
 // 设置非阻塞
@@ -36,5 +52,24 @@ GwConnCloseLuaEnv();
 
 void *
 GwConnResponse(void *socketFile);
+
+// initialize SSL server  and create context
+SSL_CTX *
+GwConnInitServerCTX(void);
+
+GwConnection *
+GwConnSSLOpenSocket(unsigned short port);
+
+/* release context */
+void
+GwConnSSLFree(GwConnection *conn);
+
+/* Serve the connection -- threadable */
+void
+Servlet(SSL* ssl);
+
+// test ssl
+int
+GwConnSSLTest();
 
 #endif /* gwconnection_h */
