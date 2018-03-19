@@ -30,7 +30,6 @@ enum _EnumProtocol{
     EnumProtocolHttps = 1
 };
 
-// 封装 connection
 typedef struct _GwConnection GwConnection;
 struct _GwConnection{
     unsigned short port;
@@ -52,10 +51,6 @@ GwConnCloseLuaEnv();
 
 void *
 GwConnResponse(void *socketFile);
-
-// initialize SSL server  and create context
-SSL_CTX *
-GwConnInitServerCTX(void);
 
 GwConnection *
 GwConnSSLOpenSocket(unsigned short port);

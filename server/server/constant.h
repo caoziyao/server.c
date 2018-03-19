@@ -9,4 +9,6 @@
 #ifndef constant_h
 #define constant_h
 
+typedef    unsigned char     u_char;
+
 #endif /* constant_h */

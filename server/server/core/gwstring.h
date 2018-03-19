@@ -1,10 +1,6 @@
 //
 //  gwstring.h
 //  server
-//
-//  Created by working on 2018/3/19.
-//  Copyright © 2018年 working. All rights reserved.
-//
 
 #ifndef gwstring_h
 #define gwstring_h
@@ -13,6 +9,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "constant.h"
 
 typedef struct _GwString GwString;
 

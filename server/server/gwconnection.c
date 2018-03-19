@@ -1,7 +1,7 @@
 //
 //  gwconnection.c
 //  server
-//
+// 封装 connection
 /* create certs
  openssl genrsa -out privkey.pem 2048
  openssl req -new -x509 -key privkey.pem -out cacert.pem -days 1095
@@ -230,9 +230,9 @@ GwConnSSLTest() {
     int server;
     unsigned int port = 3001;
     
-    ctx = GwConnInitServerCTX();                                /* initialize SSL */
-    LoadCertificates(ctx, "cacert.pem", "privkey.pem");    /* load certs */
-    GwConnection *conn = GwConnOpenSocket(port);                /* create server socket */
+    ctx = GwConnInitServerCTX();
+    LoadCertificates(ctx, "cacert.pem", "privkey.pem");  
+    GwConnection *conn = GwConnOpenSocket(port);
     server = conn->server;
     while (1) {
         struct sockaddr_in addr;
@@ -243,12 +243,12 @@ GwConnSSLTest() {
 //        int client = accept(server, &addr, &len);        /* accept connection as usual */
         printf("Connection: %s:%d\n", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
         /* 基于ctx 产生一个新的SSL */
-        ssl = SSL_new(ctx);                             /* get new SSL state with context */
+        ssl = SSL_new(ctx);
         /* 将新连接的socket 加入到SSL */
-        SSL_set_fd(ssl, client);                        /* set connection socket to SSL state */
-        Servlet(ssl);                                    /* service connection */
+        SSL_set_fd(ssl, client);
+        Servlet(ssl);
     }
-    close(server);                                        /* close server socket */
-    SSL_CTX_free(ctx);                                    /* release context */
+    close(server);
+    SSL_CTX_free(ctx);
     return 0;
 }

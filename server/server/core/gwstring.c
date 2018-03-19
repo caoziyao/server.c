@@ -1,10 +1,6 @@
 //
 //  gwstring.c
 //  server
-//
-//  Created by working on 2018/3/19.
-//  Copyright © 2018年 working. All rights reserved.
-//
 
 // todo string 数据结构
 // data指向字符串数据的第一个字符，字符串的结束用长度来表示，而不是由’\0’来表示结束
