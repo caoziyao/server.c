@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "constant.h"
+//#include "constant.h"
 
 typedef struct _GwString GwString;
 

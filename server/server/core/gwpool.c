@@ -63,14 +63,15 @@ _GwMemZero(GwPool *pool, size_t size) {
 // 新建节点
 static GwPool *
 _GwPoolCreateNote(size_t size) {
-    if (size < sizeof(GwPool)) {
+    int sizeOfPool = sizeof(GwPool);
+    if (size < sizeOfPool) {
         printf("size < sizeof(GwPool) at GwPoolCreateNote\n");
         return NULL;
     }
     
     /* 执行内存池头部 */
     size_t max = (size < Max_Alloc_From_Pool) ? size : Max_Alloc_From_Pool;
-    GwPool *p = malloc(max);
+    GwPool *p = malloc(max + sizeOfPool);
     _GwMemZero(p, max);
     
     if (p == NULL) {
@@ -78,8 +79,8 @@ _GwPoolCreateNote(size_t size) {
         return NULL;
     }
     
-    p->d.last = (char *)p + sizeof(GwPool);
-    p->d.end = (char *)p + size;
+    p->d.last = (char *)p + sizeOfPool;
+    p->d.end = (char *)p + sizeOfPool + max;
     p->d.next = NULL;
     p->d.failed = 0;
     
@@ -96,6 +97,7 @@ _GwPoolCreateNote(size_t size) {
     
     return p;
 }
+
 
 /*
  分配一个新的内存池，并将该内存池连接到现有内存池链表中
@@ -136,7 +138,7 @@ static void *
 _GwPoolPallcLarge(GwPool *pool, size_t size) {
     void            *p;
     size_t          n;
-    GwPoolLarge     *large;
+    GwPoolLarge     *large, *next;
     
     /* 分配内存 */
     large = malloc(size + sizeof(GwPoolLarge));
@@ -153,8 +155,8 @@ _GwPoolPallcLarge(GwPool *pool, size_t size) {
     /* 若在该pool之前已经分配了large字段，
      * 则将所分配的大块内存挂载到内存池的large字段中
      */
-    large = pool->large;
-    if (large == NULL) {
+    next = pool->large;
+    if (next == NULL) {
         pool->large = large;
         return p;
     } else {
@@ -162,8 +164,8 @@ _GwPoolPallcLarge(GwPool *pool, size_t size) {
          * 则执行分配ngx_pool_large_t 结构体，分配large字段内存，
          * 再将大块内存挂载到pool的large字段中
          */
-        while (large->next != NULL) {
-            large = large->next;
+        while (next != NULL) {
+            next = large->next;
         }
         large->next = large;
         return p;
@@ -171,7 +173,6 @@ _GwPoolPallcLarge(GwPool *pool, size_t size) {
 }
 
 
-// create_pool  size_t size
 /*
  创建一个初始节点大小为size的pool。
  并且size的大小必须小于等于NGX_MAX_ALLOC_FROM_POOL，且必须大于sizeof(ngx_pool_t)
@@ -215,7 +216,6 @@ GwPoolPallc(GwPool *pool, size_t size) {
                 p->d.last = m + size;   /* 在该节点指向的内存块中分配size大小的内存 */
                 return m;
             }
-            
             /* 若不满足，则查找下一个内存池 */
             p = p->d.next;
         }
@@ -236,7 +236,7 @@ GwPoolPallc(GwPool *pool, size_t size) {
 void
 GwPoolDestroy(GwPool *pool) {
     GwPool          *p, *n;
-    GwPoolLarge     *l;
+    GwPoolLarge     *l, *lpre;
     GwPoolCleanup   *c;
     
     /* 若注册了cleanup，则遍历该链表结构，依次调用handler函数清理数据 */
@@ -247,12 +247,20 @@ GwPoolDestroy(GwPool *pool) {
     }
     
     /* 遍历 large 链表，释放大块内存 */
-    for (l = pool->large; l; l = l->next) {
-        if (l->alloc != NULL) {
-            /* 释放内存 */
-            free(l->alloc);
-        }
+    l = pool->large;
+    while (l != NULL) {
+        lpre = l;
+        l = l->next;
+        free(lpre);
     }
+    pool->large = NULL;
+    
+//    for (l = pool->large; l; l = l->next) {
+//        if (l->alloc != NULL) {
+//            /* 释放内存 */
+//            free(l->alloc);
+//        }
+//    }
     
     /* 在debug模式下执行 if 和 endif 之间的代码；
      * 主要是用于log记录，跟踪函数销毁时日志信息
@@ -266,33 +274,56 @@ GwPoolDestroy(GwPool *pool) {
             break;
         }
     }
+    pool = NULL;
 }
 
 
 // 打印内存
 void
 GwPoolLogger(GwPool *pool) {
-    size_t max;
-    GwPool *p, *next;
-    char *last, *end;
-    int i = 0;
+    
+    GwPoolLarge *large;
+    GwPool      *p, *next;
+    size_t      max, lmax, unuse;
+    char        *last, *end;
+    void        *alloc;
+
     
     p = pool;
+    if (p == NULL) {
+        printf("pool null\n");
+        return;
+    }
+    
+    // print large
+    int j = 0;
+    large = pool->large;
+    while (large != NULL) {
+        alloc = large->alloc;
+        lmax = large->max;
+        printf("%d large:%p alloc:%p max:%zu\n", j, large, alloc, lmax);
+        large  = large->next;
+        j++;
+    }
+    
+    // print pool
+    int     i = 0;
     while(p != NULL) {
         max = p->max;
         next = p->d.next;
         last = p->d.last;
         end = p->d.end;
+        unuse = end - last;
         if (next != NULL) {
-            printf("%d max:%d pool_addr:%p, last:%p, end:%p, next:%p\n", i, max, p, last, end, next);
+            printf("%d max:%zu, unuse:%zu, pool_addr:%p, last:%p, end:%p, next:%p\n", i, max, unuse, p, last, end, next);
         } else {
-            printf("%d max:%d pool_addr:%p, last:%p, end:%p, next:NULL\n", i, max, p, last, end);
+            printf("%d max:%zu, unuse:%zu, pool_addr:%p, last:%p, end:%p, next:NULL\n", i, max, unuse, p, last, end);
         }
         p = p->d.next;
+        i++;
     }
     printf("logger over\n");
 }
-
 
 
 //// pnalloc 则不考虑内存对齐问题

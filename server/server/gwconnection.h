@@ -24,6 +24,12 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
+#include "utils.h"
+#include "gwlua.h"
+#include "config.h"
+
+//#include "core/gwpool.h"
+
 typedef enum _EnumProtocol EnumProtocol;
 enum _EnumProtocol{
     EnumProtocolHttp = 0,

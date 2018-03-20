@@ -8,9 +8,6 @@
  */
 
 #include "gwconnection.h"
-#include "utils.h"
-#include "gwlua.h"
-#include "config.h"
 
 #define FAIL    -1
 
