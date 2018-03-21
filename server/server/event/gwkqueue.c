@@ -4,8 +4,10 @@
 
 
 #include "gwkqueue.h"
-//#include "gwsocket.h"
+
 #include "gwconnection.h"
+#include "gwpool.h"
+
 #define MAX_EVENT_COUNT 5000
 const static int FdNum = 2;         // 两个文件描述符
 

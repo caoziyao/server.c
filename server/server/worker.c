@@ -10,18 +10,10 @@
  */
 
 #include "worker.h"
-#include "threadpool.h"
-#include "gwkqueue.h"
-#include "gwpipe.h"
-#include "config.h"
-#include "gwtimer.h"
-#include "gwshm.h"
-#include "gwmutex.h"
 
 static int fd;
 static int s;
 GwShmMutex *mtx;
-
 
 void *
 signal_handler(int n)
@@ -42,24 +34,29 @@ signal_handler(int n)
 void
 GwWorkerRun(int shmid, GwConnection *conn) {
     
-//    GwShm *shm = GwShmat(shmid);
-//    mtx = &shm->mutexData;
+    // todo 更好的方案
+    GwPool *pool = GwPoolCreate(sizeof(GwWorker));
+    GwWorker *w = (GwWorker *)GwPoolPallc(pool, sizeof(GwWorker));
+    
+    w->pool = pool;
+    
+    // GwShm *shm = GwShmat(shmid);
+    // mtx = &shm->mutexData;
     int s = conn->server;
     
     fd = initKqueue();
     
     // GuaThreadPool *pool = GuaThreadPoolNew(2);
-    //  GuaThreadPoolAddTask(pool, response, n);
-
+    // GuaThreadPoolAddTask(pool, response, n);
+    // GwTimerStart(1, signal_handler);
     GwKqueueAddListener(fd, s);
-//    GwTimerStart(1, signal_handler);
 
     struct kevent events[MaxEventCount];
-    sleep(1);
     while (true) {
         int ret = kevent(fd, NULL, 0, events, MaxEventCount, NULL);
         printf("ret %d\n", ret);
         GwKqueueHandleEvent(fd, events, ret, conn);
     }
     
+    GwPoolDestroy(pool);
 }

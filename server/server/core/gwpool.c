@@ -4,7 +4,7 @@
 //
 //  Created by working on 2018/3/20.
 //  Copyright © 2018年 working. All rights reserved.
-// todo 内存管理
+// 内存管理
 
 /*
 1，大块内存的分配请求不会直接在内存池上分配内存来满足请求，而是直接向系统申请一块内存（就像直接使用 malloc 分配内存一样），
@@ -64,13 +64,15 @@ _GwMemZero(GwPool *pool, size_t size) {
 static GwPool *
 _GwPoolCreateNote(size_t size) {
     int sizeOfPool = sizeof(GwPool);
-    if (size < sizeOfPool) {
-        printf("size < sizeof(GwPool) at GwPoolCreateNote\n");
-        return NULL;
-    }
+    size_t max;
+    
+//    if (size < sizeOfPool) {
+//        printf("size < sizeof(GwPool) at GwPoolCreateNote\n");
+//        return NULL;
+//    }
     
     /* 执行内存池头部 */
-    size_t max = (size < Max_Alloc_From_Pool) ? size : Max_Alloc_From_Pool;
+    max = (size < Max_Alloc_From_Pool) ? size : Max_Alloc_From_Pool;
     GwPool *p = malloc(max + sizeOfPool);
     _GwMemZero(p, max);
     

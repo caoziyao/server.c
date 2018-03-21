@@ -21,7 +21,9 @@ GwMasterInit() {
     int n = NumberOfWorker;
     pid_t id = -1;
     
-    GwMaster *m = malloc(sizeof(GwMaster));
+    GwPool *pool = GwPoolCreate(sizeof(GwMaster));
+//    GwMaster *m = malloc(sizeof(GwMaster));
+    GwMaster *m = (GwMaster *)GwPoolPallc(pool, sizeof(GwMaster));
     
     for (int i = 0; i < n; i++) {
         id = fork();
@@ -33,6 +35,7 @@ GwMasterInit() {
     }
     m->ret = id;
     m->action = _WorkerAction;
+    m->pool = pool;
     
     return m;
 }

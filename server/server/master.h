@@ -25,6 +25,7 @@
 #include "gwshm.h"
 #include "worker.h"
 #include "gwconnection.h"
+#include "gwpool.h"
 
 typedef struct _GwMaster GwMaster;
 
@@ -36,6 +37,7 @@ struct _GwMaster{
     int ret;
     GwShm *shm;
     GwWorkerAction action;
+    GwPool *pool;
 };
 
 // 初始化 master

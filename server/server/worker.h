@@ -18,7 +18,22 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "threadpool.h"
+#include "gwkqueue.h"
+#include "gwpipe.h"
+#include "config.h"
+#include "gwtimer.h"
+#include "gwshm.h"
+#include "gwmutex.h"
+
 #include "gwconnection.h"
+#include "gwpool.h"
+
+// 定义 worker
+typedef struct _GwWorker GwWorker;
+struct _GwWorker{
+    GwPool *pool;
+};
 
 void
 GwWorkerRun(int shmid, GwConnection *conn);

@@ -26,9 +26,6 @@
 
 int
 main(int argc, const char *argv[]) {
-
-    GwPool *pool = GwPoolCreate(1000);
-//    void *a = GwPoolPallc(pool, 500);
     
     // socket
     unsigned int port = 3000;
@@ -57,7 +54,7 @@ main(int argc, const char *argv[]) {
 
     } else if (id == 0) {
         printf("chlid %d %d\n", getpid(), s);
-//        GwMasterStartWorker(master, conn);
+        GwMasterStartWorker(master, conn);
         // GwWorkerRun(s);
         GwShmdt(shm);
 
@@ -76,10 +73,9 @@ main(int argc, const char *argv[]) {
         GwMutexDestroy(mtx);
         GwShmRemove(shmid);
         
+        GwPool *pool = master->pool;
         GwPoolLogger(pool);
         GwPoolDestroy(pool);
-
-        printf("master over\n");
     }
 
     return 0;
