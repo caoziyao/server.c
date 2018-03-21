@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "sds.h"
 
 int
 main(int argc, const char *argv[]) {
