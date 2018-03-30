@@ -5,5 +5,10 @@ server by c and lua
 - 内存池对内存进行管理
 
 测试
+```
 siege -c 20 -r 1000 http://127.0.0.1:3000/
+```
 ![siege](./screen/1.png)
+
+
+Todo:
