@@ -5,7 +5,7 @@ server by c and lua
 - 内存池对内存进行管理
 
 Todo:
-负载均衡
+- 负载均衡
 
 测试
 ```
