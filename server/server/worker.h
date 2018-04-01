@@ -28,6 +28,7 @@
 
 #include "gwconnection.h"
 #include "gwpool.h"
+#include "gwupstream.h"
 
 // 定义 worker
 typedef struct _GwWorker GwWorker;

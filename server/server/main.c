@@ -54,7 +54,7 @@ main(int argc, const char *argv[]) {
 
     } else if (id == 0) {
         printf("chlid %d %d\n", getpid(), s);
-        GwMasterStartWorker(master, conn);
+//        GwMasterStartWorker(master, conn);
         // GwWorkerRun(s);
         GwShmdt(shm);
 
