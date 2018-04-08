@@ -1,17 +1,19 @@
 -- config = {}
 --
--- -- 程序可以用 config.lua 来配置窗口标题 宽 高这 3 个选项
+-- -- 程序可以用 config.lua 来配置
 -- -- 定义一个常量
--- config.title = "draw lua"
--- config.width = 800
--- config.height = 600
+-- config.host = 127.0.0.1
+-- config.port = 3000
 
-config = function ()
-	-- print("logging", a)
-	local title = "draw lua"
-	local width = 800
-	local height = 600
-	return title, width, height
-end
+-- config = function ()
+-- 	-- print("logging", a)
+-- 	local t = { port = 3000, host = "127.0.0.1"}
+-- 	return t
+-- end
+
+config = {
+	port = 3000,
+	host = "127.0.0.1"
+}
 
 -- return config

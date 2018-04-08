@@ -23,4 +23,8 @@ GwLuaDoFile(char *filename);
 const char *
 GuwLuaExecl(char *filename, char *arg);
 
+// test
+const char *
+GuwLuaExeclTable(char *filename);
+
 #endif /* gwlua_h */

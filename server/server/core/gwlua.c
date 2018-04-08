@@ -7,6 +7,21 @@
 //
 /*
  gwlua 对 lua 封装
+ C调用LUA文件中的函数方法
+ 
+ lua_getglobal(L, <function name>) //获取lua中的函数
+ lua_push*() //调用lua_push系列函数，把输入参数压栈。例如lua_pushnumber(L, x)
+ lua_pcall(L, <arguments nums>, <return nums>, <错误处理函数地址>)
+ 
+ 调用函数
+ 首先，要调用的函数应该被压入堆栈；接着把需要传递给这个函数的参数按正序压栈；
+ 这是指第一个参数首先压栈。
+ 最后调用一下lua_call
+ 
+ 函数返回值
+ 函数返回值将按正序压栈（第一个返回值首先压栈），
+ 因此在调用结束后，最后一个返回值将被放在栈顶。
+ 
  */
 #include "gwlua.h"
 #include "utils.h"
@@ -30,6 +45,34 @@ GwLuaInitEnv(){
 void
 GwLuaCloseEnv(){
     lua_close(L);
+}
+
+
+// 定义一个函数stackDump来打印当前栈的情况
+static void
+stackDump (lua_State *L) {
+    int i;
+    int top = lua_gettop(L);
+    printf(".....begin dump lua stack.....\n");
+    for (i = 1; i <= top; i++) {  /* repeat for each level */
+        int t = lua_type(L, i);
+        switch (t) {
+            case LUA_TSTRING:  /* strings */
+                printf("`%s'", lua_tostring(L, i));
+                break;
+            case LUA_TBOOLEAN:  /* booleans */
+                printf(lua_toboolean(L, i) ? "true" : "false");
+                break;
+            case LUA_TNUMBER:  /* numbers */
+                printf("%g", lua_tonumber(L, i));
+                break;
+            default:  /* other values */
+                printf("%s", lua_typename(L, t));
+                break;
+        }
+        printf("  ");  /* put a separator */
+    }
+    printf("\n.....end dump lua stack.....\n");  /* end the listing */
 }
 
 
@@ -64,6 +107,42 @@ GuwLuaExecl(char *filename, char *arg){
     lua_pop(L, 1);
 
     return n3;
+}
+
+
+const char *
+GuwLuaExeclTable(char *filename){
+    if(luaL_dofile(L, filename)) {
+        printf("啊LUA ERROR: %s\n", lua_tostring(L, -1));
+        return "NULL";
+    }
+    
+    lua_getglobal(L, "config");
+    if (!lua_istable(L, -1)) {
+        printf("error! me is not a table\n");
+        return "NULL";
+    }
+//    lua_pushstring(L, arg);
+//    if(lua_pcall(L, 0, 1, 0) != 0) {
+//        printf("2 LUA ERROR: %s\n", lua_tostring(L, -1));
+//    }
+    
+    // 把 t[k] 值压入堆栈， 这里的 t 是指有效索引 index 指向的值
+    lua_getfield(L, -1, "host");
+    printf("host %s\n", lua_tostring(L, -1));
+    //把栈顶元素弹出去
+    lua_pop(L, 1);
+    
+    // 把 t[k] 值压入堆栈， 这里的 t 是指有效索引 index 指向的值
+    lua_getfield(L, -1, "port");
+
+    stackDump(L);
+    printf("port %lld\n", lua_tointeger(L, -1));
+    
+    lua_pop(L, 1);
+    
+    char *a = "aaa";
+    return a;
 }
 
 

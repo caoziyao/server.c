@@ -11,7 +11,7 @@
 
 #include <stdlib.h>
 
-#define NumberOfWorker  1       // worker进程数
+#define NumberOfWorker  3       // worker进程数
 #define MaxEventCount   5000    // kqueue event 数
 #define MaxRecvBuff     65535   // request 最大接收
 

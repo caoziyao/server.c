@@ -8,6 +8,7 @@ upstream_lib = upstream/*.c -Iupstream -Lupstream
 worker_lib = -I. -L.
 
 all:
-	cc *.c $(worker_lib) $(upstream_lib) $(event_lib) $(os_lib) $(code_lib) $(lua_lib) $(oppenssl_lib) && ./a.out
+	cc *.c $(worker_lib) $(upstream_lib) $(event_lib) $(os_lib) $(code_lib) \
+	 $(lua_lib) $(oppenssl_lib) && ./a.out
 clean:
 	rm  *.o
