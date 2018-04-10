@@ -19,6 +19,7 @@ struct GwNodeStruct {
 struct GwListStruct{
     int length;
     GwNode *tail;
+    // 首节点为 head
     GwNode *next;
 };
 
@@ -87,6 +88,7 @@ GwListLength(GwList *list) {
     return list->length;
 }
 
+
 /*
  检查一个 GwList 中是否存在某个元素
  */
@@ -103,6 +105,7 @@ GwListContains(GwList *list, type element) {
     
     return false;
 }
+
 
 /*
  在 GwList 的末尾添加一个元素
@@ -127,6 +130,7 @@ GwListAppend(GwList *list, type element) {
     list->length++;
 }
 
+
 /*
  复制字符串
  */
@@ -144,6 +148,7 @@ GwStrCpy(char *dest, const char *src) {
     //    *dest = '\0';
     return address;
 }
+
 
 /*
  比较字符串
@@ -189,6 +194,7 @@ GwListHasKey(GwList *list, const char *key) {
     return false;
 }
 
+
 /*
  判断 node key 是否相等并返回 value 值
  返回 value
@@ -208,7 +214,6 @@ GwListRetValue(GwList *list, const char *key) {
 }
 
 /*
- 
  */
 void
 GwListAppendKeyValue(GwList *list, const char *key, type value) {
@@ -248,7 +253,6 @@ GwListPrepend(GwList *list, type element) {
 }
 
 /*
- 1.5
  在一个 GwList 中查找某个元素, 返回下标(序号)
  如果不存在, 返回 -1
  */
@@ -271,18 +275,13 @@ GwListIndexOfElement(GwList *list, type element) {
 
 
 /*
- 1.6
  往一个 GwList 中插入一个元素, 下标(序号) 为 index
  不考虑非法情况(下标大于长度)
  */
 void
 GwListInsertElementAtIndex(GwList *list, type element, int index) {
-//    assert(index >= 0);
-    
     // 不考虑非法情况(下标大于长度)
     int len = GwListLength(list);
-//    assert(len >= index);
-    
     
     if (index == 0) {
         GwListPrepend(list, element);
@@ -302,6 +301,45 @@ GwListInsertElementAtIndex(GwList *list, type element, int index) {
         n->next = l->next;
         l->next = n;
         list->length++;
+    }
+}
+
+
+
+// 删除一个元素
+void
+GwListDelElement(GwList *list, const char *key) {
+    int i = 0;
+    GwNode *node = list->next;
+    GwNode *pre = list->next;
+    int len = list->length;
+    
+//    if (index == 0) {
+//
+//        list->next = NULL;
+//    }
+    while (node != NULL) {
+        if (GwStrCmp(key, node->key)) {
+            
+            if (i == 0) {
+                // 第一个
+                list->next = node->next;
+                list->tail = NULL;
+            } else if (i == len - 1){
+                // 最后一个
+                pre->next = node->next;
+                list->tail = pre;
+            } else {
+                pre->next = node->next;
+            }
+            free(node);
+            list->length--;
+            
+            break;
+        }
+        pre = node;
+        node = node->next;
+        i++;
     }
 }
 
@@ -332,6 +370,7 @@ equalGwList(GwList *src, GwList *dest) {
     }
     return true;
 }
+
 
 /*
  判断 list key value是否相等

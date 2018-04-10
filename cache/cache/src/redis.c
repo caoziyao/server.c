@@ -29,6 +29,11 @@ struct redisServerStruct{
     
     // 一个数组，保存服务器中的所有数据库
     redisDb *db[DefaultDbNum];
+    
+    // 修改计数器
+    long long dirty;
+    // 上一次执行的时间, 时间戳
+    time_t lastsave;
 };
 
 
@@ -97,6 +102,8 @@ void
 redisServerDel(const char *key) {
     redisDb *db = client->db;
     dict *table = db->dict;
+    
+    dictDel(table, key);
 }
 
 
@@ -111,6 +118,10 @@ redisServerSelect(int number) {
         client->db = server->db[number];
     }
 }
+
+
+// 监听客户端
+
 
 
 // test
@@ -129,6 +140,13 @@ redisServerTest() {
     printf("value2 %d\n", redisServerGet(key));
     
     redisServerSet(key, 234);
+    
+    printf("value2 %d\n", redisServerGet(key));
+    
+    redisServerDel(key);
+    printf("del %d\n", redisServerGet(key));
+    
+    redisServerSet(key, 444);
     
     printf("value2 %d\n", redisServerGet(key));
     

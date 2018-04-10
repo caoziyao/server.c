@@ -105,6 +105,10 @@ void
 GwListRemoveFirstElement(GwList *list);
 
 
+// 删除一个元素
+void
+GwListDelElement(GwList *list, const char *key);
+
 /*
  复制字符串
  */

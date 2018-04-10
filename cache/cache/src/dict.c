@@ -120,6 +120,16 @@ dictGet(dict *table, const char *key){
 }
 
 
+// 删除一个 key
+void
+dictDel(dict *table, const char *key) {
+    int index = _GwIndexOfKey(key);
+    GwList *l = table->list[index];
+    
+    GwListDelElement(l, key);
+}
+
+
 // 销毁一个 hashtable
 void
 dictRemove(dict *table){

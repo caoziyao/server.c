@@ -36,6 +36,10 @@ dictHas(dict *table, const char *key);
 int
 dictGet(dict *table, const char *key);
 
+// 删除一个 key
+void
+dictDel(dict *table, const char *key);
+
 // 销毁一个 hashtable
 void
 dictRemove(dict *table);
