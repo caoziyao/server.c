@@ -10,11 +10,13 @@
 #include <unistd.h>
 
 #include "test.h"
+#include "redis.h"
 
 int
 main(int argc, const char *argv[]) {
     
     printf("cache\n");
     
+    redisServerTest();
     return 0;
 }

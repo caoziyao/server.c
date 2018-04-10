@@ -16,17 +16,17 @@
 #define MaxSize 1000    // 暂时指定 1000 个长度
 
 // 结构的具体定义
-struct GwHashTableStruct {
+struct dictStruct {
     GwList *list[MaxSize];
 };
 
 
 // 创建并返回一个 hashtable
-GwHashTable *
-GwHashTableCreate(){
+dict *
+dictCreate(){
     
     // malloc 申请一块内存, 并初始化一下
-    GwHashTable *t = malloc(sizeof(GwHashTable));
+    dict *t = malloc(sizeof(dict));
     
     for (int i = 0; i < MaxSize; i++) {
         GwList *l = GwListCreate(NULL, 0);
@@ -49,6 +49,7 @@ _LengthOfString(const char *s) {
     return len;
 }
 
+
 int
 _GwHashOfKey(const char *key) {
     int n = 1;
@@ -63,20 +64,21 @@ _GwHashOfKey(const char *key) {
     return n;
 }
 
+
 /*
  先计算出下标
  */
 int
 _GwIndexOfKey(const char *key) {
-    
     return _GwHashOfKey(key) % MaxSize;
 }
+
 
 /*
  insert at index
  */
 void
-_GwInsertAtIndex(GwHashTable *table, int index, const char *key, int value) {
+_GwInsertAtIndex(dict *table, int index, const char *key, int value) {
     
     GwList *l = table->list[index];
     
@@ -84,19 +86,19 @@ _GwInsertAtIndex(GwHashTable *table, int index, const char *key, int value) {
     
 }
 
-// 往 hashtbale 中设置一个值, GwHashTable 只支持 int 类型的值
+
+// 往 hashtbale 中设置一个值, dict 只支持 int 类型的值
 void
-GwHashTableSet(GwHashTable *table, const char *key, int value){
+dictSet(dict *table, const char *key, int value){
     
     int index = _GwIndexOfKey(key);
     _GwInsertAtIndex(table, index, key, value);
 }
 
-//
 
 // 检查 hashtable 中是否存在这个 key
 bool
-GwHashTableHas(GwHashTable *table, const char *key){
+dictHas(dict *table, const char *key){
     
     int index = _GwIndexOfKey(key);
     GwList *l = table->list[index];
@@ -107,18 +109,20 @@ GwHashTableHas(GwHashTable *table, const char *key){
     return false;
 }
 
-// 返回 hashtable 中 key 对应的值, 不考虑 key 不存在的情况, 用户应该用 GwHashTableHas 自行检查是否存在
+
+// 返回 hashtable 中 key 对应的值, 不考虑 key 不存在的情况, 用户应该用 dictHas 自行检查是否存在
 int
-GwHashTableGet(GwHashTable *table, const char *key){
+dictGet(dict *table, const char *key){
     int index = _GwIndexOfKey(key);
     GwList *l = table->list[index];
     
     return GwListRetValue(l, key);
 }
 
+
 // 销毁一个 hashtable
 void
-GwHashTableRemove(GwHashTable *table){
+dictRemove(dict *table){
     
     for (int i = 0; i < MaxSize; i++) {
         GwList *l = table->list[i];
@@ -127,11 +131,12 @@ GwHashTableRemove(GwHashTable *table){
     free(table);
 }
 
+
 /*
- GwHashTable log
+ dict log
  */
 void
-GwHashTableLog(GwHashTable *table) {
+dictLog(dict *table) {
     
     for (int i = 0; i < MaxSize; i++) {
         GwList *l = table->list[i];
@@ -142,11 +147,12 @@ GwHashTableLog(GwHashTable *table) {
     }
 }
 
+
 /*
  测试 2 个 hash table 是否相等
  */
 bool
-equalGwHashTable(GwHashTable *src, GwHashTable *dest) {
+equaldict(dict *src, dict *dest) {
     
     for (int i = 0; i < MaxSize; i++) {
         GwList *l1 = src->list[i];

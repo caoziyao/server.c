@@ -30,7 +30,7 @@ struct GwListStruct{
 GwList *
 GwListCreate(int *element, int numberOfElements) {
     // assert 是用于确保一定条件的断言
-    assert(numberOfElements >= 0);
+//    assert(numberOfElements >= 0);
     
     // malloc 申请一块内存, 并初始化一下
     GwList *list = malloc(sizeof(GwList));
@@ -133,7 +133,7 @@ GwListAppend(GwList *list, type element) {
 char *
 GwStrCpy(char *dest, const char *src) {
     
-    assert((dest != NULL) && (src != NULL));
+//    assert((dest != NULL) && (src != NULL));
     
     char *address = dest;
     
@@ -151,7 +151,7 @@ GwStrCpy(char *dest, const char *src) {
  */
 bool
 GwStrCmp(const char *s1,const char *s2){
-    assert((s1 != NULL) && (s2 != NULL));
+//    assert((s1 != NULL) && (s2 != NULL));
     
     while((*s1 != '\0') && (*s2 != '\0')) {
         if (*s1++ != *s2++) {
@@ -277,11 +277,11 @@ GwListIndexOfElement(GwList *list, type element) {
  */
 void
 GwListInsertElementAtIndex(GwList *list, type element, int index) {
-    assert(index >= 0);
+//    assert(index >= 0);
     
     // 不考虑非法情况(下标大于长度)
     int len = GwListLength(list);
-    assert(len >= index);
+//    assert(len >= index);
     
     
     if (index == 0) {
